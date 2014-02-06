@@ -320,7 +320,7 @@
        	    buffId="MANA_STONE_REGEN"
        	    type="ATTRIBUTE_MULTIPLIER"
        	    attribute="MANA_REGEN"
-       	    multiplier="1.5"/>
+       	    multiplier="1.6"/>
         <action
             type="AFFECT_TARGETS">
             <target
