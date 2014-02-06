@@ -4,7 +4,7 @@
         id="DROWSER"
         name="Drowser"
         tooltip="Basic tower."
-        maxHealth="120"
+        maxHealth="119"
         buildCost="10"
         unlockCost="0"
         sprite="towers/drowser.png"
