@@ -64,7 +64,7 @@ public enum HeroStat {
 	private final static double HEALTH_REGEN_MODIFIER_STR(){return 0.6;}
 	private final static double ARMOR_PER_STR(){return 0.22;}
 	private final static double MANA_MODIFIER_INT(){return 0.2;}
-	private final static double MANA_REGEN_MODIFIER_INT(){return 0.2;}
+	private final static double MANA_REGEN_MODIFIER_INT(){return 0.13;}
 	private final static double SPEED_MODIFIER_DEX(){return 0.08;}
 	private final static double DAMAGE_MODIFIER_DEX(){return 0.16;}
 
