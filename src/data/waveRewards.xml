@@ -1,0 +1,86 @@
+<waves>
+    <wave number="1">
+        <tower>ALAKAZAM</tower>
+        <tower>CHARIZARD</tower>
+        <item>HEALTH_POTION</item>
+        <item>MANA_POTION</item>
+        <money>30</money>
+    </wave>
+    
+    <wave number="2">
+        <exclusive>
+        	<item probability="0.5">BOH</item>
+        	<item probability="0.5">MANA_STONE</item>
+    	</exclusive>
+        <money>35</money>
+	</wave>
+	
+    <wave number="3">
+        <tower>ZUBAT</tower>
+		<item probability="0.2">BOH</item>
+		<item probability="0.2">MANA_STONE</item>
+		<item probability="0.3">RESTORE_PLUS</item>
+		<exclusive>
+			<item probability="0.2">FROST_BITE</item>
+			<item probability="0.2">FIRE_STONE</item>
+		</exclusive>        
+		<exclusive>
+			<item probability="0.1">DEATH_MASK</item>
+			<item probability="0.1">BLOOD_SUCKER</item>
+		</exclusive>
+        <money>40</money>
+	</wave>
+	
+    <wave number="4">
+        <item>RESTORE_PLUS</item>
+        <item probability="0.2">BOH</item>
+		<item probability="0.2">MANA_STONE</item>
+        <item probability="0.4">FROST_BITE</item>
+        <item probability="0.4">FIRE_STONE</item>
+        <exclusive>
+			<item probability="0.3">MANA_POTION_PLUS</item>
+			<item probability="0.3">HEALTH_POTION_PLUS</item>
+		</exclusive>
+		<exclusive>
+			<item probability="0.2">DEATH_MASK</item>
+			<item probability="0.2">BLOOD_SUCKER</item>
+			<item probability="0.2">DEMON_HEART</item>
+		</exclusive>
+		
+        <money>50</money>
+	</wave>
+	
+    <wave number="5">
+    	<tower>JIGGLYPUFF</tower>
+        <money>65</money>
+        <item>HEALTH_POTION_PLUS</item>
+        <item>MANA_POTION_PLUS</item>
+        <item probability="0.3">BOH</item>
+		<item probability="0.3">MANA_STONE</item>
+		<item probability="0.6">FROST_BITE</item>
+        <item probability="0.6">FIRE_STONE</item>
+        <exclusive>
+			<item probability="0.33">DEATH_MASK</item>
+	        <item probability="0.33">BLOOD_SUCKER</item>
+	        <item probability="0.33">DEMON_HEART</item>
+        </exclusive>
+	</wave>
+	
+    <wave number="6">
+        <tower>MACHAMP</tower>
+        <money>95</money>
+        <item probability="0.5">DEMON_HEART</item>
+        <item probability="0.5">DEATH_MASK</item>
+        <item probability="0.5">BLOOD_SUCKER</item>
+        <exclusive>
+		    <item probability="0.4">HEALTH_POTION_PLUS2</item>
+		    <item probability="0.4">MANA_POTION_PLUS2</item>
+        </exclusive>
+	</wave>
+	
+    <wave number="7">
+        <money>120</money>
+        <item>HEALTH_POTION_PLUS2</item>
+        <item>MANA_POTION_PLUS2</item>
+	</wave>
+</waves>

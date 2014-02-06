@@ -1,0 +1,444 @@
+
+<itemTypes>
+    <type
+        id="RESTORE"
+        name="Restore"
+        tooltip="Restores @1 health and @2 mana every 0.5s over @3 s. Only works outside combat."
+        buyCost="4"
+        unique="false"
+        icon="items/clarityPotion.png">
+        <links>
+            <link>./action/effect/buff/buff/effect/effect[1]/@amount</link>
+            <link>./action/effect/buff/buff/effect/effect[2]/@amount</link>
+            <link>./action/effect/buff/buff/@duration</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+        	<target
+        	    type="SELF"/>
+        	<effect
+        	    type="RECEIVE_BUFF">
+        	    <buff
+					type="OUTSIDE_COMBAT">
+       	            <buff
+       	                type="REPEAT_EFFECT_ON_SELF"
+       	                cooldown="0.5"
+       	                duration="15"
+       	                buffId="RESTORE_ITEM">
+       	                <effect
+       	                    type="COMPOSITE">
+       	                    <effect
+       	                        type="HEALING"
+       	                        amount="5"/>
+       	                    <effect
+       	                        type="CHANGE_MANA"
+       	                        amount="5"/>
+       	                </effect>
+       	            </buff>   
+        	    </buff>
+       	    </effect>
+  	    </action>	
+    </type>
+
+    <type
+        id="RESTORE_PLUS"
+        name="Restore+"
+        tooltip="Restores @1 health and @2 mana every 0.5s over @3 s. Only works outside combat."
+        buyCost="10"
+        unique="false"
+        icon="items/clarityPotion.png">
+        <links>
+            <link>./action/effect/buff/buff/effect/effect[1]/@amount</link>
+            <link>./action/effect/buff/buff/effect/effect[2]/@amount</link>
+            <link>./action/effect/buff/buff/@duration</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+            <target
+                type="SELF"/>
+            <effect
+                type="RECEIVE_BUFF">
+                <buff
+                    type="OUTSIDE_COMBAT">
+                    <buff
+                        type="REPEAT_EFFECT_ON_SELF"
+                        cooldown="0.5"
+                        duration="15"
+                        buffId="RESTORE_ITEM">
+                        <effect
+                            type="COMPOSITE">
+                            <effect
+                                type="HEALING"
+                                amount="10"/>
+                            <effect
+                                type="CHANGE_MANA"
+                                amount="10"/>
+                        </effect>
+                    </buff>   
+                </buff>
+            </effect>
+        </action>   
+    </type>
+    
+
+    <type
+        id="HEALTH_POTION"
+        name="Health"
+        tooltip="Instantly restores @1 health."
+        buyCost="4"
+        unique="false"
+        icon="items/healthPotion.png">
+        <links>
+            <link>./action/effect/@amount</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+        	<target
+        	    type="SELF"/>
+        	<effect
+        	    type="HEALING"
+        	    amount="140">
+        	</effect>
+        </action>
+    </type>
+
+    <type
+        id="HEALTH_POTION_PLUS"
+        name="Health+"
+        tooltip="Instantly restores @1 health."
+        buyCost="10"
+        unique="false"
+        icon="items/healthPotion.png">
+        <links>
+            <link>./action/effect/@amount</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+            <target
+                type="SELF"/>
+            <effect
+                type="HEALING"
+                amount="300">
+            </effect>
+        </action>
+    </type>
+
+    <type
+        id="HEALTH_POTION_PLUS2"
+        name="Health++"
+        tooltip="Instantly restores @1 health."
+        buyCost="16"
+        unique="false"
+        icon="items/healthPotion.png">
+        <links>
+            <link>./action/effect/@amount</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+            <target
+                type="SELF"/>
+            <effect
+                type="HEALING"
+                amount="600">
+            </effect>
+        </action>
+    </type>
+    
+
+    <type
+        id="MANA_POTION"
+        name="Mana"
+        tooltip="Instantly restores @1 mana."
+        buyCost="4"
+        unique="false"
+        icon="items/bluePotion.png">
+        <links>
+            <link>./action/effect/@amount</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+        	<target
+        	    type="SELF"/>
+        	<effect
+        	    type="CHANGE_MANA"
+        	    amount="120">
+        	</effect>
+        </action>
+    </type>
+    
+
+    <type
+        id="MANA_POTION_PLUS"
+        name="Mana+"
+        tooltip="Instantly restores @1 mana."
+        buyCost="10"
+        unique="false"
+        icon="items/bluePotion.png">
+        <links>
+            <link>./action/effect/@amount</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+        	<target
+        	    type="SELF"/>
+        	<effect
+        	    type="CHANGE_MANA"
+        	    amount="250">
+        	</effect>
+        </action>
+    </type> 
+
+    <type
+        id="MANA_POTION_PLUS2"
+        name="Mana++"
+        tooltip="Instantly restores @1 mana."
+        buyCost="16"
+        unique="false"
+        icon="items/bluePotion.png">
+        <links>
+            <link>./action/effect/@amount</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+            <target
+                type="SELF"/>
+            <effect
+                type="CHANGE_MANA"
+                amount="500">
+            </effect>
+        </action>
+    </type> 
+    
+    <type
+        id="SPECIAL_POTION"
+        name="Special"
+        tooltip="Instantly restores @1 health and @2 mana."
+        buyCost="25"
+        unique="true"
+        icon="items/specialPotion.png">
+        <links>
+            <link>./action/effect/effect[1]/@amount</link>
+            <link>./action/effect/effect[2]/@amount</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+        	<target
+        	    type="SELF"/>
+        	<effect
+        	    type="COMPOSITE">
+		       	<effect
+		       	    type="HEALING"
+		       	    amount="350">
+		       	</effect>
+                <effect
+                    type="CHANGE_MANA"
+                    amount="250">
+                </effect>
+	       	</effect>
+        </action>
+    </type>
+    
+
+    <type
+        id="BOH"
+        name="BOH"
+        tooltip="Grants increased movement speed. [x@1]"
+        buyCost="20"
+        unique="true"
+        icon="items/boots.png">
+        <links>
+            <link>./buff/@multiplier</link>
+        </links>
+        <buff
+            buffId="BOH_SPEED"
+    		type="ATTRIBUTE_MULTIPLIER"
+   	    	attribute="MOVEMENT_SPEED"
+   	    	multiplier="1.3"/>  
+    </type>
+    
+
+    <type
+        id="FROST_BITE"
+        name="Frost bite"
+        tooltip="Freezes nearby foes for @1 seconds. Can be used several times. [Range = @2]"
+        buyCost="40"
+        unique="true"
+        icon="items/frostBite.png"
+        dropOnUse="false">
+        <links>
+            <link>./action/effect/@duration</link>
+            <link>./action/target/@range</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+        	<target
+        	    type="IN_RANGE"
+        	    range="4"
+        	    targetTeam="EVIL"/>
+        	<effect
+        	    type="STUN"
+        	    duration="2.5">
+        	</effect>
+        </action>
+    </type>
+    
+
+    <type
+        id="DEMON_HEART"
+        name="Demon heart"
+        tooltip="Increases hero damage [x@1], but removes all natural health regeneration."
+        buyCost="40"
+        unique="true"
+        icon="items/volcanoGem.png">
+        <links>
+            <link>./buff[2]/@multiplier</link>
+        </links>
+       	<buff
+       	    buffId="HEART_REGEN"
+       	    type="ATTRIBUTE_MULTIPLIER"
+       	    attribute="HEALTH_REGEN"
+       	    multiplier="0.001"/>
+       	<buff
+       	    buffId="HEART_DAMAGE"
+       	    type="ATTRIBUTE_MULTIPLIER"
+       	    attribute="DAMAGE"
+       	    multiplier="1.3"/>
+    </type>
+    
+
+    <type
+        id="MANA_STONE"
+        name="Mana stone"
+        tooltip="Increases hero mana regeneration [x@1], and can be consumed to instantly restore all mana"
+        buyCost="40"
+        unique="true"
+        icon="items/manaStone.png">
+       	<links>
+            <link>./buff/@multiplier</link>
+        </links>
+       	<buff
+       	    buffId="MANA_STONE_REGEN"
+       	    type="ATTRIBUTE_MULTIPLIER"
+       	    attribute="MANA_REGEN"
+       	    multiplier="1.3"/>
+        <action
+            type="AFFECT_TARGETS">
+            <target
+                type="SELF"/>
+            <effect
+                type="CHANGE_MANA"
+                amount="999999"/>
+        </action>
+    </type>
+    
+
+    <type
+        id="BLOOD_SUCKER"
+        name="Blood sucker"
+        tooltip="Drains the life out of adjacent foes, leeching @1 health from each foe every @2 seconds."
+        buyCost="40"
+        unique="true"
+        icon="items/helmet.png">
+        <links>
+            <link>./buff/action/effect/@healingAmount</link>
+            <link>./buff/@cooldown</link>
+        </links>
+       	<buff
+       	    buffId="BLOOD_SUCKER_AOE"
+       	    type="REPEAT_ACTION"
+       	    cooldown="0.8">
+            <action
+                type="AFFECT_TARGETS">
+		       	<target
+		       	    type="ADJACENT"
+		       	    targetTeam="EVIL"/>
+		       	<effect
+		       	    type="DRAIN_LIFE"
+	       	    	healingAmount="3"
+	       	    	damageAmount="3"/>
+	       	</action> 
+       	</buff>
+    </type>
+    
+
+    <type
+        id="ESCAPE"
+        name="Escape TODO"
+        tooltip="TODO"
+        buyCost="40"
+        unique="true"
+        icon="items/helmet.png"> 
+    </type>
+    
+
+    <type
+		id="DEATH_MASK"
+		name="Death mask"
+		tooltip="Protects the hero from death. When dealt a mortal blow, the hero survives and instead gains full health."
+		buyCost="40"
+		unique="true"
+		icon="items/purpleMask.png">
+        <buff
+            type="EFFECT_ON_SELF_WHEN_LOW_LIFE"
+            buffId="DEATHMASK_BUFF"
+            healthThresholdPercent="0">
+            <effect
+                type="COMPOSITE">
+                <effect
+                    type="HEALING"
+                    amount="999999">
+       	            <animation
+       	                width="150"
+       	                height="150">
+       	                <image>items/purpleMask.png</image>
+       	            </animation>
+  	            </effect>
+                <effect
+                    type="HERO_DROP_ITEM"
+                    item="DEATH_MASK"/>
+            </effect>
+        </buff>
+    </type>
+    
+
+    <type
+        id="FIRE_STONE"
+        name="Fire stone"
+        tooltip="Throw an explosive stone 2 squares forward, damaging and stunning all foes adjacent to impact location. [@1 damage, @2 seconds stun]"
+        buyCost="5"
+        unique="false"
+        icon="items/volcanoGem.png">
+        <links>
+            <link>./action/effect/effect[1]/@amount</link>
+            <link>./action/effect/effect[2]/@duration</link>
+        </links>
+        <action
+            type="AFFECT_TARGETS">
+            <target
+				type="RECTANGLE_AHEAD"
+				skipNFirstSquares="1"
+				width="3"
+				length="3"
+				targetTeam="EVIL">
+                <animation>
+                    <image>items/volcanoGem.png</image>
+                </animation>
+            </target>
+            <effect
+                type="COMPOSITE">
+                <effect
+                    type="LOSE_HEALTH"
+                    amount="15"
+                    ignoreArmor="false"/>
+                <effect
+                    type="STUN"
+                    duration="2"/>
+            </effect>
+            
+        </action>
+    </type>
+        
+
+    
+</itemTypes>
+

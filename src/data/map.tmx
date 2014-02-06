@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
+<map version="1.0" orientation="orthogonal" width="30" height="23" tilewidth="40" tileheight="40">
+ <tileset name="myTileset" firstgid="1" tilewidth="40" tileheight="40">
+  <image source="images/stoneTiles.jpg"/>
+  <tile id="0">
+   <properties>
+    <property name="checkpoint1" value=""/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="checkpoint2" value=""/>
+   </properties>
+  </tile>
+  <tile id="192">
+   <properties>
+    <property name="checkpoint" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="comments" width="30" height="23">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAGNgwA068Mjh04OOR8HwBqNxPApoAWiZrkbT7OAG+OKH3LgbjfNRQAwgJZ2MpinqAUrCEgAxXkKKyAoAAA==
+  </data>
+ </layer>
+ <layer name="tdAllowed" width="30" height="23" visible="0">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAO3USwrAMAgFQI/vsbOXp8H/RkGyEJy0tRLpwUatOljkpLsRmy7KrbucW9fbyk43Ujs37srvOumis8PU3M55ln2n9oTHrfzH0XtFvX67xWtr86PNeJWdeb7unXpuzn03mrcIyAoAAA==
+  </data>
+ </layer>
+ <layer name="towersAllowed" width="30" height="23" visible="0">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAO3S4QqAIAwE4D2+j92vQMQ7t3VMqQIJnOy7cs3MGlhGanc9+6x6VbrMeqPrOad2I/P1u3E3k0/l7vrer7pjvdKdvdUuyjDLp3Y99/nUyrosTzQT+q993WNGbTY/aF9hs/lB51Wupw/rXeWu+pzsXsfwQhPICgAA
+  </data>
+ </layer>
+ <layer name="heroAllowed" width="30" height="23" visible="0">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAO2S2w0AIAgDHd+xXcAgj7ZqwiX+ci04Ro2ZfFXa216F15sJ6T1lUvW13GovCqsLo6c1m7Xbn7xobnkjGVizWW7vPpF7j/5bdO+IX933pZ5ZKvfdsQAeq6uNyAoAAA==
+  </data>
+ </layer>
+ <layer name="game" width="30" height="23" opacity="0.2">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAAJ2VQY7CMAxFe4HSCxQukHZXqNQtnQswc66ZDVvKCeCMk0r+0ufLSQOLr5gQ/PGL69ZVVdWixtaR4p3E+6jJ2R8dtSbO01qO2mL9zYHOcAxf3c/5cp4Q1ZlvsHO9fe6olprOdOTb2fmwEbeyr4xHZ89TinNp3Dq+nrTuFOfSOBTUBt+ezr/LWeMSplpvqp/X9S/q19Z3OG/5aj8HYrj6LVE3W0s4p+5V71f7OQhD1Ip1izP6mJls9Th8meGNPBcn57p3J87I7TFR3xRnnM9xfkQ9hTNmBTPx6s1xzsUL+Xos+V493534ls4KeD4dzrXjl+NcOitwr1gxk1O+/B368JP5/HA4az3a2z1pyojPpThzP6d8wYo9T1FD1FHiwfHe6mePq/Jdc85RX1FnieE9k3fJfE71D+bUmusS9R31I/Ve5H/Au+Q9qPV5zxN0Ep9B/tPR8n7yHsTdgMnkeF1Js+3hTJPhfDelOBwonoTt1dGZ6m4k5756fXbRz1tMtF7Pl1nrPEEPY119/wGtUI2+yAoAAA==
+  </data>
+ </layer>
+</map>

@@ -1,0 +1,369 @@
+<enemyTypes>
+	
+	<type
+		id="SKELETON_WARRIOR"
+		name="Skeleton warrior"
+		description=""
+		health="100"
+		armor="0"
+		movementCooldown="900"
+		aggroRange="6"
+		moneyReward="2"
+		expReward="1"
+		spriteBasePath="characters/skeletonWarrior/skeleton"
+		spriteFileType="png"
+		spriteNamingSystem="DIRECTION"
+		deathSound="death/skeletonWarriorDeath.wav"
+		deathSoundVolume="1.7">
+		<attack
+			type="MELEE"
+			baseDamage="7"
+			randomDamage="5"
+			cooldown="1000"
+			sound="swordSwing.wav"
+			soundVolume="0.6"
+		/>
+
+	</type>
+	
+	<type
+		id="SKELETON_PROPHET"
+		name="Skeleton prophet"
+		description="Healer"
+		health="165"
+		armor="1"
+		movementCooldown="900"
+		aggroRange="5"
+		moneyReward="3"
+		expReward="2"
+		spriteBasePath="characters/skeletonProphet/skeleton"
+		spriteFileType="png"
+		spriteNamingSystem="DIRECTION"
+		deathSound="death/skeletonProphetDeath.wav"
+		deathSoundVolume="1.7">
+		<attack
+			type="RANGED"
+			baseDamage="6"
+			randomDamage="6"
+			cooldown="700"
+			range="3.6"
+			projectileSize="8"
+			projectileColor="green"
+			projectileSpeed="850"
+			sound="iceSpell3.wav"
+			soundVolume="1"
+		/>
+		
+		<buff
+		    type="REPEAT_ACTION"
+		    cooldown="3"
+		    buffId="PROPHET_BEHAVIOUR">
+		    <action
+		        type="AFFECT_TARGETS">
+		        <target
+		            type="FILTER_BELOW_HEALTH"
+		            healthThresholdPercent="65"
+		            maxNumTargets="1" >
+		            <target
+		                type="IN_RANGE"
+		                range="5.5"
+		                targetTeam="EVIL"
+		                />
+		        </target>
+		        <effect
+		            type="COMPOSITE">
+		            <effect
+		                type="HEALING"
+		                amount="40">
+		                <animation>
+						    <image>abilities/healing.png</image>
+						</animation>
+	                </effect>
+		            <effect
+		                type="REVERSED_ROLES">
+		                <effect
+		                    type="STUN"
+		                    duration="1.8"/>
+		            </effect>
+		        </effect>
+		            
+		    </action>
+		</buff>
+	</type>
+
+	
+	<type
+		id="SKELETON_PIRATE"
+		name="Skeleton pirate"
+		description="Steadfast"
+		health="250"
+		armor="5"
+		movementCooldown="750"
+		aggroRange="6"
+		moneyReward="4"
+		expReward="2"
+		spriteBasePath="characters/skeletonPirate/skeleton"
+		spriteFileType="png"
+		spriteNamingSystem="NUMBER"
+		deathSound="death/skeletonPirateDeath.wav"
+		deathSoundVolume="1.6"
+		stunDurationMultiplier="0.7">
+		<attack
+			type="MELEE"
+			baseDamage="15"
+			randomDamage="9"
+			cooldown="1200"
+			sound="skeletonSwing.wav"
+			soundVolume="1"
+		/>
+		
+		<buff
+		    buffId="PIRATE_BEHAVIOUR"
+		    type="EFFECT_ON_SELF_WHEN_LOW_LIFE"
+		    healthThresholdPercent="35">
+	        <effect
+	            type="COMPOSITE">
+	        	<effect
+	        		type="GAIN_STUN_IMMUNITY"/>	    
+	    	    <effect
+	    	        type="GAIN_SLOW_IMMUNITY"/>
+	    	    <effect
+	    	    	type="RECEIVE_BUFF">
+	    	    	<buff
+	    	    		type="ARMOR"
+	    	    		amount="1"
+	    	    		buffId="PIRATE_ARMOR_BUFF">
+	    	    		<animation>
+					        <image>abilities/blueLightning.png</image>
+					    </animation>
+					</buff>
+				</effect>
+	        </effect>
+		    
+		</buff>
+	</type>
+
+	<type
+		id="WOLF"
+		name="Wolf"
+		description=""
+		health="75"
+		armor="2"
+		movementCooldown="420"
+		aggroRange="8"
+		moneyReward="1"
+		expReward="1"
+		spriteBasePath="characters/wolf/skeleton"
+		spriteFileType="png"
+		spriteNamingSystem="NUMBER"
+		deathSound="death/wolfDeath.wav"
+		deathSoundVolume="1.5">
+		<attack
+			type="MELEE"
+			baseDamage="6"
+			randomDamage="2"
+			cooldown="1000"
+			sound="skeletonSwing.wav"
+			soundVolume="1"
+		/>
+	
+	</type>
+	
+	
+	
+	<type
+		id="WIND_WRAITH"
+		name="Wind wraith"
+		description="Bound to its summoner"
+		health="240"
+		armor="2"
+		movementCooldown="560"
+		aggroRange="8"
+		moneyReward="0"
+		expReward="0"
+		spriteBasePath="characters/windWraith/skeleton"
+		spriteFileType="png"
+		spriteNamingSystem="NUMBER"
+		deathSound="death/poofDeath.wav"
+		deathSoundVolume="1.5">
+		<attack
+			type="RANGED"
+			baseDamage="5"
+			randomDamage="9"
+			cooldown="1000"
+			range="5"
+			projectileSize="6"
+			projectileColor="blue"
+			projectileSpeed="0.7"
+			sound="skeletonSwing.wav"
+			soundVolume="1"
+		/>
+		
+	</type>
+	
+	<type
+		id="OLD_MAGE"
+		name="Old mage"
+		description="Shielding summoner"
+		health="300"
+		armor="2"
+		movementCooldown="900"
+		aggroRange="6"
+		moneyReward="14"
+		expReward="4"
+		spriteBasePath="characters/oldMage/skeleton"
+		spriteFileType="png"
+		spriteNamingSystem="NUMBER"
+		deathSound="death/zombieMoan.wav"
+		deathSoundVolume="1"
+		stunDurationMultiplier="0.5">
+		<attack
+			type="RANGED"
+			baseDamage="10"
+			randomDamage="8"
+			cooldown="2000"
+			range="5"
+			projectileSize="8"
+			projectileColor="green"
+			projectileSpeed="0.6"
+			sound="skeletonSwing.wav"
+			soundVolume="1"
+		/>
+		
+		<buff
+		    type="COMPOSITE">
+			
+			<buff
+			    buffId="OLDMAGESUMMON"
+			    type="REPEAT_EFFECT_ON_SELF"
+				cooldown="4">
+			    <effect
+			        type="COMPOSITE_UNTIL_FAIL">
+			        <effect 
+			            type="RECEIVE_SUMMONED_MINION"
+			            minion="WIND_WRAITH">
+		                <animation>
+					        <image>abilities/blueLightning.png</image>
+					    </animation>
+				    </effect>
+			        <effect
+			            type="STUN"
+			            duration="1"/>
+			    </effect>
+			</buff>
+			
+			<buff
+			    type="EFFECT_ON_SELF_WHEN_LOW_LIFE"
+			    healthThresholdPercent="99"
+			    buffId="OLDMAGE_WAIT_FOR_SHIELD">
+			    <effect
+			        type="RECEIVE_BUFF">
+		            <buff
+		                type="REPEAT_EFFECT_ON_SELF"
+		                cooldown="9"
+						buffId="OLDMAGE_REPEAT_SHIELD">
+		                <effect
+		                    type="RECEIVE_BUFF">
+		                    <buff
+		                        type="SHIELD"
+		                        duration="4"
+		                        buffId="OLD_MAGE_SHIELD"
+		                        amount="250">
+		                        <animation>
+							        <image>abilities/blueLightning.png</image>
+							        <image>abilities/healing.png</image>
+							    </animation>
+	                        </buff>
+		                </effect>
+		            </buff>
+			    </effect>
+		    </buff>
+	    </buff>
+	</type>
+	
+	<type
+		id="FROST_MAIDEN"
+		name="Frost maiden"
+		description=""
+		health="400"
+		armor="6"
+		movementCooldown="560"
+		aggroRange="6"
+		moneyReward="9"
+		expReward="3"
+		spriteBasePath="characters/frostMaiden/skeleton"
+		spriteFileType="png"
+		spriteNamingSystem="NUMBER"
+		deathSound="death/boneCrush.wav"
+		deathSoundVolume="1.5"
+		immuneToSlow="true"
+		stunDurationMultiplier="0.5">
+		<attack
+			type="MELEE"
+			baseDamage="10"
+			randomDamage="10"
+			cooldown="800"
+			sound="skeletonSwing.wav"
+			soundVolume="1"
+		/>
+	</type>
+	
+	<type
+		id="SHADOW_WITCH"
+		name="Shadow witch"
+		description="Powerful caster"
+		health="700"
+		armor="7"
+		movementCooldown="600"
+		aggroRange="6"
+		moneyReward="18"
+		expReward="5"
+		spriteBasePath="characters/shadowWitch/skeleton"
+		spriteFileType="png"
+		spriteNamingSystem="NUMBER"
+		deathSound="death/zombieMoan.wav"
+		deathSoundVolume="1"
+		stunDurationMultiplier="0.5">
+		<attack
+			type="RANGED"
+			baseDamage="1"
+			randomDamage="10"
+			cooldown="500"
+			range="4"
+			projectileSize="8"
+			projectileColorR="0.8"
+			projectileColorG="0.2"
+			projectileColorB="1"
+			projectileSpeed="0.6"
+			sound="skeletonSwing.wav"
+			soundVolume="1"/>
+	</type>
+	
+	<type
+		id="DARK_ANGEL"
+		name="Dark angel"
+		description="Unidentified"
+		health="2100"
+		armor="9"
+		movementCooldown="600"
+		aggroRange="8"
+		moneyReward="30"
+		expReward="10"
+		spriteBasePath="characters/darkAngel/skeleton"
+		spriteFileType="png"
+		spriteNamingSystem="NUMBER"
+		deathSound="death/zombieMoan.wav"
+		deathSoundVolume="1"
+		stunDurationMultiplier="0.3">
+		<attack
+			type="MELEE"
+			baseDamage="40"
+			randomDamage="70"
+			cooldown="2000"
+			sound="skeletonSwing.wav"
+			soundVolume="1"
+		/>
+	
+	</type>
+	
+</enemyTypes>
