@@ -65,16 +65,12 @@ import applicationSpecific.ItemType;
 	}
 	
 	void itemWasAdded(ItemType item, char[] itemChars){
-		System.out.println("invButtonRow. itemWasAdded  " + item);//TODO
 		for(Button b : buttons){
 			if(b instanceof InventoryButton && ((InventoryButton)b).getItem() == item){
-				System.out.println("found existing item  " + item + "add sto stacksize");//TODO
 				((InventoryButton)b).addToStackSize(1);
-				System.out.println("stacksize = " + ((InventoryButton)b).getStackSize());//TODO
 				return;
 			}
 		}
-		System.out.println("itemdidnt exist. add new button  " + item);//TODO
 		addInventoryButton(item, itemChars, 1);
 	}
 

@@ -52,7 +52,6 @@ public class Hero extends StepperUnit {
 				stats.birthSound, stats.deathSound, attributeListeners);
 		baseMaxMana = stats.baseMana;
 		maxMana = baseMaxMana;
-		System.out.println("hero constr. notify listeners attribute changed maxmana"); //TODO
 		notifyListenersAttributeChanged(EntityAttribute.MAX_MANA, maxMana);
 		mana = (int) (maxMana * 0.75);
 		manaRegenCooldown = stats.manaRegenCooldown;

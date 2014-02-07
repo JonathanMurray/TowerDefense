@@ -40,15 +40,18 @@ public class Game extends StateBasedGame {
 	private static HashMap<HeroType, HeroData> globalHeroStats;
 	private static WaveReward[] globalWaveRewards;
 	
-	public Game() {
+	private boolean render;
+	
+	public Game(boolean render) {
 		super(GAME_TITLE);
+		this.render = render;
 	}
 
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
 		
-		addState(new SplashScreenState());
-		addState(new GamePlayState());
+		addState(new SplashScreenState(render));
+		addState(new GamePlayState(render));
 		addState(new PausedState());
 		enterState(STATE_SPLASHSCREEN);
 		

@@ -29,6 +29,12 @@ public class SplashScreenState extends BasicGameState {
 	private static boolean heroStatsLoaded = false;
 	private static boolean waveRewardsLoaded = false;
 	
+	private boolean render;
+	
+	public SplashScreenState(boolean render){
+		this.render = render;
+	}
+	
 	@Override
 	public void init(GameContainer container, StateBasedGame game) throws SlickException {
 
@@ -42,6 +48,10 @@ public class SplashScreenState extends BasicGameState {
 
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
+		
+		if(!render){
+			return;
+		}
 		
 		if(!mapCreated){
 			g.setColor(Color.gray);
