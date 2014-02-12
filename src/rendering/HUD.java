@@ -101,7 +101,7 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 	private int maxItems;
 	private List<HUD_InputListener> listeners = new ArrayList<>();
 
-	public HUD(GUIContext container, HeroType heroType, HUD_keyChars keyChars, int maxLife, int maxAbilities, int maxItems) {
+	public HUD(GUIContext container, HUD_keyChars keyChars, int maxLife, int maxAbilities, int maxItems) {
 		this.container = container;
 		HUD.keyChars = keyChars;
 		this.maxLife = maxLife;

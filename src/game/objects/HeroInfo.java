@@ -193,9 +193,9 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 	
 
 
-	boolean hasMaxNumberOfAbilities() {
-		return abilities.size() == MAX_ABILITIES;
-	}
+//	boolean hasMaxNumberOfAbilities() {
+//		return abilities.size() == MAX_ABILITIES;
+//	}
 	
 	public void giveAbilityReward(){
 		if(nextAbilityRewardIndex < abilityRewards.length){
