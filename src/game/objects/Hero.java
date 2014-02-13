@@ -1,15 +1,12 @@
 package game.objects;
 
 import game.AbilityData;
-import game.Game;
 import game.HeroInfoListenerExtender;
-import game.Sounds;
-import game.Game.Team;
-import game.HeroInfoListener;
+import game.LoadedData;
 import game.Map;
+import game.Sounds;
 
 import java.awt.Dimension;
-import java.awt.ItemSelectable;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,7 +16,6 @@ import javax.naming.OperationNotSupportedException;
 import org.newdawn.slick.Graphics;
 
 import rendering.RenderUtil;
-
 import applicationSpecific.AbilityType;
 import applicationSpecific.HeroType;
 import applicationSpecific.ItemType;
@@ -67,13 +63,13 @@ public class Hero extends StepperUnit {
 			@Override
 			public void abilityWasReplacedByNew(AbilityType oldAbility,	AbilityType newAbility) {
 				abilitiesWithTimeSinceUse.remove(oldAbility);
-				AbilityData stats = Game.getAbilityData(newAbility);
+				AbilityData stats = LoadedData.getAbilityData(newAbility);
 				abilitiesWithTimeSinceUse.put(newAbility, stats.cooldown); 
 			}
 
 			@Override
 			public void abilityWasAdded(AbilityType newAbility) {
-				AbilityData stats = Game.getAbilityData(newAbility);
+				AbilityData stats = LoadedData.getAbilityData(newAbility);
 				abilitiesWithTimeSinceUse.put(newAbility, stats.cooldown);
 			}
 		});
@@ -90,7 +86,7 @@ public class Hero extends StepperUnit {
 
 	public boolean tryToUseItem(ItemType item) {
 		if (timeUntilItemReady <= 0) {
-			Game.getItemData(item).wasUsed(this);
+			LoadedData.getItemData(item).wasUsed(this);
 			timeUntilItemReady = ITEM_COOLDOWN;
 			HeroInfo.INSTANCE.notifyHeroUsedItem(item, timeUntilItemReady);
 			return true;
@@ -114,13 +110,13 @@ public class Hero extends StepperUnit {
 	}
 
 	private boolean hasEnoughManaForAbility(AbilityType abilityType) {
-		AbilityData ability = Game.getAbilityData(abilityType);
+		AbilityData ability = LoadedData.getAbilityData(abilityType);
 		return mana >= ability.manaCost;
 	}
 
 	private boolean isAbilityReady(AbilityType abilityType) {
 		int timeSinceUse =  getAbilityTimeSinceUse(abilityType);
-		return timeSinceUse > Game.getAbilityData(abilityType).cooldown;
+		return timeSinceUse > LoadedData.getAbilityData(abilityType).cooldown;
 	}
 
 //	public int getAbilityPercentRemainingCooldown(AbilityType abilityType) {
@@ -131,7 +127,7 @@ public class Hero extends StepperUnit {
 
 	public void tryToUseAbility(AbilityType abilityType) {
 		if (canUseAbility(abilityType)) {
-			AbilityData stats = Game.getAbilityData(abilityType);
+			AbilityData stats = LoadedData.getAbilityData(abilityType);
 			performAction(stats.action);
 			if(stats.sound != null){
 				Sounds.play(stats.sound);

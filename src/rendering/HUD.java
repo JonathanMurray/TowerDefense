@@ -1,7 +1,8 @@
 package rendering;
 
-import game.Game;
 import game.HeroInfoListener;
+import game.LoadedData;
+import game.OfflineGame;
 import game.PlayerListener;
 import game.ResourceLoader;
 import game.objects.Entity;
@@ -27,7 +28,6 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.gui.GUIContext;
 
 import applicationSpecific.AbilityType;
-import applicationSpecific.HeroType;
 import applicationSpecific.ItemType;
 import applicationSpecific.TowerType;
 
@@ -187,10 +187,10 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 		}
 		isChoosingAbility = true;
 
-		DialogChoice replacement = new DialogChoice(Game.getAbilityData(newAbility));
+		DialogChoice replacement = new DialogChoice(LoadedData.getAbilityData(newAbility));
 		DialogChoice[] old = new DialogChoice[abilities.size()];
 		for (int i = 0; i < abilities.size(); i++) {
-			old[i] = new DialogChoice(Game.getAbilityData(abilities.get(i)));
+			old[i] = new DialogChoice(LoadedData.getAbilityData(abilities.get(i)));
 		}
 		Dialog dialog = KeyboardDialog.createDialogWithReplacement(this, container, "Choose ability to replace:", new Point(DIALOG_LOCATION_X,
 				DIALOG_LOCATION_Y), replacement, old);
@@ -219,7 +219,7 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 
 		DialogChoice[] choices = new DialogChoice[newAbilities.length + 1];
 		for (int i = 0; i < newAbilities.length; i++) {
-			choices[i] = new DialogChoice(Game.getAbilityData(newAbilities[i]));
+			choices[i] = new DialogChoice(LoadedData.getAbilityData(newAbilities[i]));
 		}
 		choices[newAbilities.length] = new DialogChoice(ResourceLoader.createBlankImage(1, 1), "None", "Keep your existing\nabilities");
 		Dialog dialog = KeyboardDialog.createDialog(this, container, "Pick new ability:", new Point(DIALOG_LOCATION_X, DIALOG_LOCATION_Y), choices);

@@ -1,20 +1,19 @@
 package game.actions.targetPickers;
 
-import game.Game.Team;
+import game.Entities;
+import game.OfflineGamePlayState;
+import game.Physics;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
 import game.objects.EntityNotFound;
+import game.objects.Team;
 import game.objects.Unit;
-import game.Entities;
-import game.GamePlayState;
-import game.Physics;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-
 
 import org.newdawn.slick.Animation;
 
@@ -84,7 +83,7 @@ public class TargetLineAhead implements TargetPicker {
 	private Entity getTargetOnLocation(Point location, boolean renderAnimations) {
 		try {
 			if(renderAnimations && animation != null){
-				GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(Physics.getPixelCenterLocation(location),animation));
+				OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(Physics.getPixelCenterLocation(location),animation));
 			}
 			return Entities.getEntityOnLocation(location, targetTeam);
 		} catch (EntityNotFound e) {

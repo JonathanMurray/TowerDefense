@@ -32,13 +32,13 @@ public class PausedState extends BasicGameState{
 	public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
 		if(container.getInput().isKeyPressed(Input.KEY_P)){
 			System.out.println("enter gameplay again");
-			game.enterState(Game.STATE_GAMEPLAY);
+			game.enterState(OfflineGame.STATE_GAMEPLAY);
 		}
 	}
 
 	@Override
 	public int getID() {
-		return Game.STATE_PAUSED;
+		return OfflineGame.STATE_PAUSED;
 	}
 
 	public static void setImage(Image img) {

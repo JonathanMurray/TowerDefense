@@ -1,7 +1,7 @@
 package applicationSpecific;
 
 import game.Entities;
-import game.GamePlayState;
+import game.OfflineGamePlayState;
 import game.Player;
 import game.ResourceLoader;
 import game.SoundWrapper;

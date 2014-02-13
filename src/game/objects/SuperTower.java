@@ -1,6 +1,6 @@
 package game.objects;
 
-import game.Game.Team;
+
 import game.Entities;
 import game.Map;
 import game.RangedAttack;

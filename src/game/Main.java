@@ -23,7 +23,7 @@ public class Main {
 		
 		try{
 //			ScalableGame game = new ScalableGame(new Game(), 2048, 1638);
-			ScalableGame game = new ScalableGame(new Game(true), 1440, 1296, true);
+			ScalableGame game = new ScalableGame(new OfflineGame(true), 1440, 1296, true);
 			AppGameContainer container = new AppGameContainer(game);
 			container.setShowFPS(true);
 

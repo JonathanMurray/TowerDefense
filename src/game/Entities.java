@@ -1,9 +1,9 @@
 package game;
 
-import game.Game.Team;
 import game.objects.Entity;
 import game.objects.EntityNotFound;
 import game.objects.HeroInfo;
+import game.objects.Team;
 import game.objects.enemies.Enemy;
 
 import java.awt.Point;

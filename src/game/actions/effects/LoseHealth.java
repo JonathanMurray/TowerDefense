@@ -1,6 +1,6 @@
 package game.actions.effects;
 
-import game.GamePlayState;
+import game.OfflineGamePlayState;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.buffs.StunWithImmunity;
@@ -42,7 +42,7 @@ public class LoseHealth implements Effect {
 			target.loseHealth(multipliedDamage);
 		}
 		if(animation != null){
-			GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
+			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
 		}
 		return true;
 	}

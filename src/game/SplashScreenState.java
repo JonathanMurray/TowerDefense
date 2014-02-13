@@ -31,8 +31,11 @@ public class SplashScreenState extends BasicGameState {
 	
 	private boolean render;
 	
-	public SplashScreenState(boolean render){
+	private GamePlayState gameplayState;
+	
+	public SplashScreenState(GamePlayState gameplayState, boolean render){
 		this.render = render;
+		this.gameplayState = gameplayState;
 	}
 	
 	@Override
@@ -146,7 +149,7 @@ public class SplashScreenState extends BasicGameState {
 		
 		if(!wavesLoaded){
 			try {
-				GamePlayState.setWaves(new Waves(loadWavesDataFromFile(Paths.WAVES_PATH)));
+				gameplayState.setWaves(new Waves(loadWavesDataFromFile(Paths.WAVES_PATH)));
 				wavesLoaded = true;
 				return;
 			} catch (FileNotFoundException e) {
@@ -156,50 +159,50 @@ public class SplashScreenState extends BasicGameState {
 		}
 		
 		if(!enemyStatsLoaded){
-			Game.loadEnemyData();
+			LoadedData.loadEnemyData();
 			enemyStatsLoaded = true;
 			return;
 		}
 		
 		if(!towerStatsLoaded){
-			Game.loadTowerData();
+			LoadedData.loadTowerData();
 			towerStatsLoaded = true;
 			return;
 		}
 		
 		
 		if(!abilityStatsLoaded){
-			Game.loadAbilityData();
+			LoadedData.loadAbilityData();
 			abilityStatsLoaded = true;
 			return;
 		}
 		
 		if(!itemStatsLoaded){
-			Game.loadItemData();
+			LoadedData.loadItemData();
 			itemStatsLoaded = true;
 			return;
 		}
 		
 		if(!heroStatsLoaded){
-			Game.loadHeroData();
+			LoadedData.loadHeroData();
 			heroStatsLoaded = true;
 			return;
 		}
 		
 		if(!waveRewardsLoaded){
-			Game.loadWaveRewards();
+			LoadedData.loadWaveRewards();
 			waveRewardsLoaded = true;
 			return;
 		}
 		
-		game.enterState(Game.STATE_GAMEPLAY);
+		game.enterState(OfflineGame.STATE_GAMEPLAY);
 		
 	}
 
 
 	@Override
 	public int getID() {
-		return Game.STATE_SPLASHSCREEN;
+		return OfflineGame.STATE_SPLASHSCREEN;
 	}
 	
 	public WavesData loadWavesDataFromFile(String filePath) throws FileNotFoundException {

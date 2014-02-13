@@ -1,6 +1,6 @@
 package rendering;
 
-import game.Game;
+import game.LoadedData;
 
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.gui.GUIContext;
@@ -15,7 +15,7 @@ class TowerButtonRow extends ButtonRow {
 
 	void addTowerButton(TowerType tower) {
 		int firstEmptyIndex = getFirstEmptyButtonIndex();
-		TowerButton button = new TowerButton(container, getNthButtonRectangle(firstEmptyIndex + 1), tower, Game.getTowerData(tower));
+		TowerButton button = new TowerButton(container, getNthButtonRectangle(firstEmptyIndex + 1), tower, LoadedData.getTowerData(tower));
 		button.addListener(this);
 		addButton(button);
 		button.setUnlockAreaActive(button.getTowerData().unlockCost <= money);

@@ -1,7 +1,7 @@
 package rendering;
 
-import game.Game;
 import game.ItemData;
+import game.LoadedData;
 
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.gui.GUIContext;
@@ -13,7 +13,7 @@ class VendorButton extends Button {
 	private ItemData itemData;
 
 	VendorButton(GUIContext container, Rectangle iconRect,ItemType item) {
-		this(container, iconRect, item, Game.getItemData(item));
+		this(container, iconRect, item, LoadedData.getItemData(item));
 	}
 	
 	private VendorButton(GUIContext container, Rectangle iconRect,ItemType item, ItemData stats) {

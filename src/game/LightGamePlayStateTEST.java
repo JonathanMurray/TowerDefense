@@ -32,7 +32,7 @@ public class LightGamePlayStateTEST extends BasicGameState {
 	
 	@Override
 	public int getID() {
-		return Game.STATE_GAMEPLAY;
+		return OfflineGame.STATE_GAMEPLAY;
 	}
 	
 	@Override

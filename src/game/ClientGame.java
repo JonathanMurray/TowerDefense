@@ -14,10 +14,15 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
+import applicationSpecific.AbilityType;
+import applicationSpecific.ItemType;
+import applicationSpecific.TowerType;
+
 import rendering.HUD;
+import rendering.HUD_InputListener;
 import rendering.HUD_keyChars;
 
-public class ClientGame extends BasicGame {
+public class ClientGame extends BasicGame implements HUD_InputListener, PlayerListener {
 
 	java.util.Map<Integer, ClientVisualEffect> visualEffects = new HashMap<>();
 	HashMap<Integer, Animation> animations = new HashMap<>();
@@ -59,7 +64,7 @@ public class ClientGame extends BasicGame {
 		// Player.INSTANCE.addListener(hud);
 		// Player.INSTANCE.setup();
 
-		hud.addInputListener(HeroInfo.INSTANCE);
+		hud.addInputListener(this);
 		hud.addInputListener(Player.INSTANCE);
 		hud.addInputListener(PlayerInputHandler.INSTANCE);
 
@@ -186,22 +191,70 @@ public class ClientGame extends BasicGame {
 		return false;
 	}
 
-	
-	// private void renderVisibleObjects(Graphics g) {
-	// for (VisibleObject object : visibleObjects) {
-	// if (!(object instanceof AnimationBasedVisualEffect)) {
-	// object.render(g);
-	//
-	// }
-	// }
-	// for (VisibleObject object : visibleObjects) {
-	// if (object instanceof AnimationBasedVisualEffect) {
-	// object.render(g);
-	// }
-	// }
-	// for (VisibleObject object : visibleObjects) {
-	// object.renderExtraVisuals(g);
-	// }
-	// }
+	@Override
+	public void pressedBuyItem(ItemType itemType) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void towerSelected(TowerType towerType) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pressedUnlockTower(TowerType towerType) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pressedReplaceAbility(AbilityType oldAbility, AbilityType newAbility) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pressedAddAbility(AbilityType newAbility) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void towerWasAdded(TowerType towerType) {
+		hud.towerWasAdded(towerType);
+	}
+
+	@Override
+	public void towerWasUnlocked(TowerType towerType) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void itemWasAdded(ItemType itemType) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void itemWasRemoved(ItemType itemType) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void moneyWasUpdated(int newAmount) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void playerLifeWasUpdated(int newAmount) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

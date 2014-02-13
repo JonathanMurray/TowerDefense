@@ -1,6 +1,6 @@
 package rendering;
 
-import game.Game;
+import game.LoadedData;
 
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.gui.GUIContext;
@@ -52,7 +52,7 @@ class AbilityButtonRow extends ButtonRow {
 
 	void addAbilityButton(AbilityType ability, char[] abilityChars) {
 		int firstEmptyIndex = getFirstEmptyButtonIndex();
-		AbilityButton button = new AbilityButton(container, getNthButtonRectangle(firstEmptyIndex + 1), ability, Game.getAbilityData(ability),
+		AbilityButton button = new AbilityButton(container, getNthButtonRectangle(firstEmptyIndex + 1), ability, LoadedData.getAbilityData(ability),
 				abilityChars[firstEmptyIndex]);
 		addButton(button);
 	}
@@ -68,7 +68,7 @@ class AbilityButtonRow extends ButtonRow {
 			if (button instanceof AbilityButton) {
 				AbilityButton abilityButton = (AbilityButton) button;
 				if (abilityButton.getAbilityType() == oldAbility) {
-					abilityButton.setAbility(newAbility, Game.getAbilityData(newAbility));
+					abilityButton.setAbility(newAbility, LoadedData.getAbilityData(newAbility));
 					return;
 				}
 			}

@@ -1,7 +1,6 @@
 package game.objects;
 
 import game.DirectionSpriteSet;
-import game.Game.Team;
 
 import java.awt.Point;
 import java.util.Arrays;

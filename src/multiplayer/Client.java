@@ -19,6 +19,8 @@ import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
+import applicationSpecific.TowerType;
+
 	public class Client{
 		
 		ClientGame game;
@@ -78,6 +80,7 @@ import org.newdawn.slick.SlickException;
 			@Override
 			public void messageReceived(IoSession session, Object message) {
 				Message msg = (Message)message;
+				System.out.println("server: " + msg);
 				
 				switch(msg.type){
 				case ADD_VISUAL_EFFECT:
@@ -87,6 +90,26 @@ import org.newdawn.slick.SlickException;
 				case UPDATE_PHYSICS:
 					UpdatePhysicsData d2 = (UpdatePhysicsData)msg.data;
 					game.setVisualEffectPhysics(d2.id, new Point(d2.pixelX, d2.pixelY), d2.horPixelsPerSec, d2.verPixelsPerSec);
+					break;
+				case CLIENT_READY:
+					break;
+				case ITEM_WAS_ADDED:
+					break;
+				case ITEM_WAS_REMOVED:
+					break;
+				case MONEY_WAS_UPDATED:
+					break;
+				case PLAYER_LIFE_WAS_UPDATED:
+					break;
+				case REMOVE:
+					break;
+				case TOWER_WAS_ADDED:
+					IdMessageData d9 = (IdMessageData)msg.data;
+					game.towerWasAdded(TowerType.values()[d9.id]);
+					break;
+				case TOWER_WAS_UNLOCKED:
+					break;
+				default:
 					break;
 				
 				}

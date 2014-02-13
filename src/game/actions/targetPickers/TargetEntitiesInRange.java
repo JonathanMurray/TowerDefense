@@ -1,20 +1,14 @@
 package game.actions.targetPickers;
 
-import game.Game.Team;
-import game.actions.Action;
+import game.Entities;
+import game.OfflineGamePlayState;
 import game.actions.ParameterName;
 import game.actions.Parameters;
-import game.actions.effects.Effect;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
-import game.objects.enemies.Enemy;
-import game.Entities;
-import game.GamePlayState;
+import game.objects.Team;
 
 import java.util.ArrayList;
-
-import javax.naming.OperationNotSupportedException;
-
 
 import org.newdawn.slick.Animation;
 
@@ -40,7 +34,7 @@ public class TargetEntitiesInRange implements TargetPicker {
 			closeTargets.remove(actor);
 		}
 		if(renderAnimations && animation != null){
-			GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
+			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
 		}
 		return closeTargets.toArray(new Entity[0]);
 	}

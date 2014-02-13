@@ -1,19 +1,18 @@
 package game.actions.targetPickers;
 
-import game.Game.Team;
+import game.Entities;
+import game.OfflineGamePlayState;
+import game.Physics;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
 import game.objects.EntityNotFound;
+import game.objects.Team;
 import game.objects.Unit;
-import game.Entities;
-import game.GamePlayState;
-import game.Physics;
 
 import java.awt.Point;
 import java.util.ArrayList;
-
 
 import org.newdawn.slick.Animation;
 
@@ -50,7 +49,7 @@ public class TargetRectangleAhead implements TargetPicker {
 				try {
 					Point targetLocation = Physics.getRelativeLocation(actor.getLocation(), ((Unit)actor).getDirection(), stepsForward, stepsRight);
 					if(renderAnimations && animation != null){
-						GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect( Physics.getPixelCenterLocation(targetLocation),animation));
+						OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect( Physics.getPixelCenterLocation(targetLocation),animation));
 					}	
 					Entity target = Entities.getEntityOnLocation(targetLocation, targetTeam);
 					targets.add(target);

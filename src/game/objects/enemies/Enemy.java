@@ -1,11 +1,9 @@
 package game.objects.enemies;
 
 import game.Attack;
-import game.Game;
-import game.Game.Team;
 import game.DeathListener;
-import game.GamePlayState;
-import game.EntityHealthListener;
+import game.OfflineGamePlayState;
+import game.LoadedData;
 import game.Map;
 import game.Player;
 import game.RangedAttack;
@@ -15,11 +13,11 @@ import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
 import game.objects.HeroInfo;
 import game.objects.SeekerUnit;
+import game.objects.Team;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -51,7 +49,7 @@ public class Enemy extends SeekerUnit {
 				minions.remove(entity);
 			}
 		});
-		GamePlayState.addEnemy(summon);
+		OfflineGamePlayState.addEnemy(summon);
 	}
 	
 	public boolean canHaveMoreMinions(){
@@ -64,7 +62,7 @@ public class Enemy extends SeekerUnit {
 	}
 	
 	public static Enemy constructEnemyAtLocation(EnemyType type, LaneType laneOrigin, Point location){
-		EnemyData statsForThisType = Game.getEnemyData(type);
+		EnemyData statsForThisType = LoadedData.getEnemyData(type);
 		return new Enemy(statsForThisType, laneOrigin, location);
 	}
 
@@ -218,7 +216,7 @@ public class Enemy extends SeekerUnit {
 	public void DEBUGPingLocation(Point location) {
 		Point effectLocation = new Point(location.x * Map.getTileWidth() + 20,
 				location.y * Map.getTileHeight() + 20);
-		GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(effectLocation, ResourceLoader
+		OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(effectLocation, ResourceLoader
 				.createTileScaledAnimation(false, 100, "bubble2.png",
 						"bubble.png")));
 	}

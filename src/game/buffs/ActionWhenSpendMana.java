@@ -1,7 +1,7 @@
 package game.buffs;
 
-import game.Game;
 import game.HeroInfoListener;
+import game.LoadedData;
 import game.actions.Action;
 import game.actions.ContextParameterMap;
 import game.actions.ContextVariable;
@@ -76,7 +76,7 @@ public class ActionWhenSpendMana extends Buff implements HeroInfoListener{
 	@Override
 	public void heroUsedAbility(AbilityType ability, int timeUntilCanUseAgain) {
 		System.out.println("ActionWhenSPendMana.heroUsedAbility");
-		int manaCost = Game.getAbilityData(ability).manaCost;
+		int manaCost = LoadedData.getAbilityData(ability).manaCost;
 		Parameters parameters = contextParameterMap.getParameters(ContextVariable.MANA_CHANGE_AMOUNT, - manaCost);
 		carrier.performAction(action, parameters);
 		timesLeft --;

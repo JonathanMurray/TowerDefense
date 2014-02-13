@@ -127,7 +127,7 @@ public class PlayerInputHandler implements HUD_InputListener {
 	}
 
 	private static void itemKeyWasPressed(Hero hero, int itemIndex, ItemType item) {
-		ItemData itemStats = Game.getItemData(item);
+		ItemData itemStats = LoadedData.getItemData(item);
 		if (itemStats.canBeUsed()) {
 			hero.tryToUseItem(item);
 		}

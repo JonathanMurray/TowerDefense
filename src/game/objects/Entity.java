@@ -2,7 +2,6 @@ package game.objects;
 
 import game.DeathListener;
 import game.EntityHealthListener;
-import game.Game.Team;
 import game.Map;
 import game.Physics;
 import game.SoundWrapper;

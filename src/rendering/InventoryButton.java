@@ -1,7 +1,7 @@
 package rendering;
 
-import game.Game;
 import game.ItemData;
+import game.LoadedData;
 import game.ResourceLoader;
 
 import org.newdawn.slick.geom.Rectangle;
@@ -15,7 +15,7 @@ import applicationSpecific.ItemType;
 	private int stackSize;
 
 	 InventoryButton(GUIContext container, Rectangle iconRect, ItemType item, char buttonChar, int stackSize) {
-		this(container,iconRect, item, Game.getItemData(item), buttonChar, stackSize);
+		this(container,iconRect, item, LoadedData.getItemData(item), buttonChar, stackSize);
 	}
 	
 	private InventoryButton(GUIContext container, Rectangle iconRect, ItemType item, ItemData stats, char buttonChar, int stackSize){
@@ -31,7 +31,7 @@ import applicationSpecific.ItemType;
 
 	 void setItem(ItemType item) {
 		this.item = item;
-		ItemData stats = Game.getItemData(item);
+		ItemData stats = LoadedData.getItemData(item);
 		if (item == null) {
 			setIcon(ResourceLoader.createBlankImage(10, 10));
 			setTexts(new String[] { "" });

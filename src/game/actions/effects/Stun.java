@@ -1,6 +1,6 @@
 package game.actions.effects;
 
-import game.GamePlayState;
+import game.OfflineGamePlayState;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.buffs.StunWithImmunity;
@@ -46,7 +46,7 @@ public class Stun implements Effect{
 			}
 		}
 		if(animation != null){
-			GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
+			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
 		}
 		return true;
 	}

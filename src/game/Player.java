@@ -12,7 +12,6 @@ import org.newdawn.slick.Input;
 
 import rendering.HUD;
 import rendering.HUD_InputListener;
-
 import applicationSpecific.AbilityType;
 import applicationSpecific.ItemType;
 import applicationSpecific.SuperTowerType;
@@ -44,6 +43,8 @@ public class Player implements HUD_InputListener{
 	private ArrayList<ItemType> availableItems = new ArrayList<ItemType>();
 
 	private ArrayList<PlayerListener> listeners = new ArrayList<PlayerListener>();
+
+	private GamePlayState gameplayState;
 
 	public static Player INSTANCE = new Player();
 	
@@ -91,12 +92,12 @@ public class Player implements HUD_InputListener{
 	 * towerType.buildCost; }
 	 */
 	public boolean affordsItem(ItemType potionType) {
-		return money >= Game.getItemData(potionType).buyCost;
+		return money >= LoadedData.getItemData(potionType).buyCost;
 	}
 
 	void tryToBuildTowerAtLocation(TowerType tower, Point location) {
 		System.out.println("Player try to build towr at loc");//TODO
-		int buildCost = Game.getTowerData(tower).buildCost;
+		int buildCost = LoadedData.getTowerData(tower).buildCost;
 		if (money >= buildCost && !Map.blockedForTowers(location.x, location.y)) {
 			buildTower(location, tower);
 			loseMoney(buildCost);
@@ -120,7 +121,7 @@ public class Player implements HUD_InputListener{
 
 	private void buildSuperTower(Point location, SuperTowerType type) {
 		SuperTower superTower = new SuperTower(type, location, upgrades);
-		GamePlayState.addSuperTower(superTower);
+		OfflineGamePlayState.addSuperTower(superTower);
 	}
 
 	boolean hasSuperTower() {
@@ -136,7 +137,7 @@ public class Player implements HUD_InputListener{
 
 	private void buildTower(Point location, TowerType type) {
 		Tower tower = Tower.createTower(type, location, upgrades);
-		GamePlayState.addTower(tower);
+		OfflineGamePlayState.addTower(tower);
 	}
 
 	void notifyTowerWasAdded(Tower tower) {
@@ -173,7 +174,7 @@ public class Player implements HUD_InputListener{
 	}
 
 	public void pressedUnlockTower(TowerType towerType) {
-		int unlockCost = Game.getTowerData(towerType).unlockCost;
+		int unlockCost = LoadedData.getTowerData(towerType).unlockCost;
 		if (money >= unlockCost) {
 			loseMoney(unlockCost);
 			unlockTower(towerType);
@@ -182,7 +183,8 @@ public class Player implements HUD_InputListener{
 
 
 
-	public void setup() {
+	public void setup(GamePlayState gameplayState) {
+		this.gameplayState =gameplayState;
 		LOSE_LIFE_SOUND = ResourceLoader.createSound("death/femaleScream.wav", 0.5f);
 		for (TowerType tower : INIT_AVAILABLE_TOWERS) {
 			addAvailableTower(tower);
@@ -211,7 +213,7 @@ public class Player implements HUD_InputListener{
 		Sounds.play(LOSE_LIFE_SOUND);
 		setLife(life - amount);
 		if (life <= 0) {
-			Game.loseGame();
+			OfflineGame.loseGame();
 		}
 	}
 	
@@ -282,9 +284,9 @@ public class Player implements HUD_InputListener{
 
 	@Override
 	public void pressedBuyItem(ItemType itemType) {
-		ItemData itemStats = Game.getItemData(itemType);
+		ItemData itemStats = LoadedData.getItemData(itemType);
 		if (HeroInfo.INSTANCE.isHeroAlive()) {
-			if (money >= itemStats.buyCost && HeroInfo.INSTANCE.hasSpaceForItem(itemType) && GamePlayState.isHeroAliveAndCloseEnoughToMerchant()) {
+			if (money >= itemStats.buyCost && HeroInfo.INSTANCE.hasSpaceForItem(itemType) && gameplayState.isHeroAliveAndCloseEnoughToMerchant()) {
 				HeroInfo.INSTANCE.equipItem(itemType);
 				loseMoney(itemStats.buyCost);
 				if (itemStats.isUnique) {

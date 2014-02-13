@@ -74,10 +74,10 @@ public class Waves {
 		}
 		removeDeadEnemies();
 		if (currentWaveHasBeenCleared() && !hasGivenRewardForCurrentWave) {
-			GamePlayState.giveRewardForWave(waveIndex + 1);
+			OfflineGamePlayState.giveRewardForWave(waveIndex + 1);
 			hasGivenRewardForCurrentWave = true;
 			if (isFinalWave()) {
-				Game.winGame();
+				OfflineGame.winGame();
 			}
 		}
 	}
@@ -110,7 +110,7 @@ public class Waves {
 			return;
 		}
 		if (!hasGivenRewardForCurrentWave) {
-			GamePlayState.giveRewardForWave(waveIndex + 1);
+			OfflineGamePlayState.giveRewardForWave(waveIndex + 1);
 		}
 		waveIndex++;
 		enemies.clear();
@@ -128,9 +128,9 @@ public class Waves {
 
 	private void spawnEnemy(EnemyType enemyData) {
 		Enemy heroEnemy = Enemy.constructEnemy(enemyData, LaneType.heroLane);
-		GamePlayState.addEnemy(heroEnemy);
+		OfflineGamePlayState.addEnemy(heroEnemy);
 		Enemy tdEnemy = Enemy.constructEnemy(enemyData, LaneType.towerLane);
-		GamePlayState.addEnemy(tdEnemy);
+		OfflineGamePlayState.addEnemy(tdEnemy);
 		enemies.add(heroEnemy);
 		enemies.add(tdEnemy);
 	}

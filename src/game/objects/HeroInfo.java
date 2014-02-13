@@ -3,8 +3,10 @@ package game.objects;
 import game.EntityHealthListener;
 import game.Game;
 import game.GamePlayState;
+import game.OfflineGamePlayState;
 import game.HeroInfoListener;
 import game.ItemData;
+import game.LoadedData;
 import game.ResourceLoader;
 import game.Sounds;
 import game.UnitMovementListener;
@@ -48,11 +50,14 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 	
 	private AbilityPair[] abilityRewards;
 	private int nextAbilityRewardIndex = 0;
+	private GamePlayState gameplayState;
 	
 	public static HeroInfo INSTANCE = new HeroInfo();
+	
 
-	public void setup(HeroType type, Point heroSpawnLocation, EntityAttributeListener... heroAttributeListeners) {
-		HeroData data = Game.getHeroData(type);
+	public void setup(GamePlayState gameplayState, HeroType type, Point heroSpawnLocation, EntityAttributeListener... heroAttributeListeners) {
+		this.gameplayState = gameplayState;
+		HeroData data = LoadedData.getHeroData(type);
 		hero = new Hero(type, data, heroSpawnLocation, heroAttributeListeners);
 		
 		initStatsMap();
@@ -154,7 +159,7 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 			equippedItems.put(newItem, 1);
 		}
 		
-		Game.getItemData(newItem).wasEquipped(hero);
+		LoadedData.getItemData(newItem).wasEquipped(hero);
 		for (HeroInfoListener listener : listeners) {
 			listener.itemWasEquipped(newItem);
 		}
@@ -174,7 +179,7 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 		if(equippedItems.get(itemType) == 0){
 			equippedItems.remove(itemType);
 		}
-		Game.getItemData(itemType).wasDropped(hero);
+		LoadedData.getItemData(itemType).wasDropped(hero);
 		for (HeroInfoListener listener : listeners) {
 			listener.itemWasDropped(itemIndex);
 		}
@@ -199,7 +204,7 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 	
 	public void giveAbilityReward(){
 		if(nextAbilityRewardIndex < abilityRewards.length){
-			GamePlayState.offerHeroOneOfAbilities(abilityRewards[nextAbilityRewardIndex]);
+			gameplayState.offerHeroOneOfAbilities(abilityRewards[nextAbilityRewardIndex]);
 			nextAbilityRewardIndex ++;
 		}
 	}
@@ -323,7 +328,7 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 
 	void notifyHeroUsedAbility(AbilityType abilityType) {
 		for(HeroInfoListener listener : listeners){
-			listener.heroUsedAbility(abilityType, Game.getAbilityData(abilityType).cooldown);
+			listener.heroUsedAbility(abilityType, LoadedData.getAbilityData(abilityType).cooldown);
 		}
 	}
 
@@ -340,7 +345,7 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 
 	@Override
 	public void newLocation(int x, int y) {
-		boolean inRangeOfVendor = GamePlayState.isHeroAliveAndCloseEnoughToMerchant();
+		boolean inRangeOfVendor = gameplayState.isHeroAliveAndCloseEnoughToMerchant();
 		for(HeroInfoListener listener : listeners){
 			listener.heroIsNowInRangeOfVendor(inRangeOfVendor);
 		}

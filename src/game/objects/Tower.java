@@ -1,15 +1,13 @@
 package game.objects;
 
 import game.Entities;
-import game.Game;
+import game.LoadedData;
 import game.Map;
 import game.RangedAttack;
 import game.TechUpgrade;
-import game.Game.Team;
 
 import java.awt.Point;
 import java.util.ArrayList;
-
 
 import applicationSpecific.TowerType;
 
@@ -22,7 +20,7 @@ public class Tower extends Entity {
 	private int attackPixelRange;
 	
 	public static Tower createTower(TowerType type, Point location, ArrayList<TechUpgrade> upgrades){
-		TowerData stats = Game.getTowerData(type);
+		TowerData stats = LoadedData.getTowerData(type);
 		return new Tower(type, stats, location, upgrades);
 	}
 

@@ -1,6 +1,6 @@
 package game.actions.effects;
 
-import game.GamePlayState;
+import game.OfflineGamePlayState;
 import game.Map;
 import game.Physics;
 import game.actions.ParameterName;
@@ -37,8 +37,8 @@ public class ReceiveSummonedMinion implements Effect{
 			if (!Map.instance().blockedForEnemy((Enemy) actor, summonLocation.x, summonLocation.y)) {
 				if(((Enemy)actor).canHaveMoreMinions()){
 					if(animation != null){
-						GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor.getPixelCenterLocation(), animation));
-						GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(Physics.getPixelCenterLocation(summonLocation), animation));
+						OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor.getPixelCenterLocation(), animation));
+						OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(Physics.getPixelCenterLocation(summonLocation), animation));
 					}
 					((Enemy)actor).receiveMinion(minionType, summonLocation);
 					return true;

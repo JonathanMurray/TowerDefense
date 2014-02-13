@@ -1,6 +1,6 @@
 package game.actions.effects;
 
-import game.GamePlayState;
+import game.OfflineGamePlayState;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
@@ -32,8 +32,8 @@ public class DrainLife implements Effect {
 		target.loseHealthIgnoringArmor(multipliedDamage);
 		actor.gainHealth(healthAmount);
 		if(animation != null){
-			GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
-			GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
+			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
+			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
 		}
 		return true;
 	}

@@ -1,13 +1,13 @@
 package game.actions.targetPickers;
 
 import game.Entities;
-import game.Game.Team;
-import game.GamePlayState;
+import game.OfflineGamePlayState;
 import game.Physics;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
 import game.objects.EntityNotFound;
+import game.objects.Team;
 import game.objects.Unit;
 
 import java.awt.Point;
@@ -40,12 +40,12 @@ public class TargetOneInFront implements TargetPicker{
 		if(targets.size() == 0){
 			Point oneAhead = Physics.getRelativeLocation(actor.getLocation(), ((Unit)actor).getDirection(), 1);
 			if(animation != null){
-				GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(oneAhead, animation));
+				OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(oneAhead, animation));
 			}
 			return new Entity[0];
 		}else{
 			if(animation != null){
-				GamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(targets.get(0), animation));
+				OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(targets.get(0), animation));
 			}
 			return targets.subList(0, 1).toArray(new Entity[0]);
 		}

@@ -1,6 +1,5 @@
 package xmlLoading;
 
-import game.Game.Team;
 import game.ResourceLoader;
 import game.actions.Action;
 import game.actions.ContextParameterMap;
@@ -10,13 +9,12 @@ import game.actions.effects.Effect;
 import game.actions.targetPickers.TargetPicker;
 import game.buffs.Buff;
 import game.objects.EntityAttribute;
+import game.objects.Team;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.newdawn.slick.Animation;
-import org.newdawn.slick.Color;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

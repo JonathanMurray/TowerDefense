@@ -2,11 +2,11 @@ package xmlLoading;
 
 import game.actions.effects.AoE_Effect;
 import game.actions.effects.ChanceEffect;
+import game.actions.effects.ChangeMana;
 import game.actions.effects.CompositeEffect;
 import game.actions.effects.CompositeEffectUntilFail;
 import game.actions.effects.DrainLife;
 import game.actions.effects.Effect;
-import game.actions.effects.ChangeMana;
 import game.actions.effects.FaceTarget;
 import game.actions.effects.GainCompleteSlowImmunity;
 import game.actions.effects.GainCompleteStunImmunity;
@@ -19,10 +19,7 @@ import game.actions.effects.ReversedRolesEffect;
 import game.actions.effects.Stun;
 import game.actions.effects.TeleportToTarget;
 
-import java.util.List;
-
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 
 import applicationSpecific.EnemyType;
 import applicationSpecific.ItemType;
