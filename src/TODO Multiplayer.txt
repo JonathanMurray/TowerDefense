@@ -11,6 +11,7 @@ TCP addRectangle(ID, pixelPos, dimension, color, velocity)
 TCP addCircle(ID, pixelPos, radius, color, velocity)
 TCP remove(ID)
 UDP update(ID, pixelPos, velocity)
+UDP update(ID, health%, mana%)
 TCP setTextbox(pixelPos, dimension, text)
 TCP removeTextBox()
 
