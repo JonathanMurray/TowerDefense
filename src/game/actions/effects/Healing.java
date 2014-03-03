@@ -1,7 +1,7 @@
 package game.actions.effects;
 
 
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
@@ -25,7 +25,7 @@ public class Healing implements Effect {
 		int amount = context.get(ParameterName.AMOUNT, this.amount);
 		target.gainHealth(amount);
 		if(animation != null){
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
 		}
 		return true;
 	}

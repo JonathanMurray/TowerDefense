@@ -2,7 +2,7 @@ package game.objects.enemies;
 
 import game.Attack;
 import game.DeathListener;
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.LoadedData;
 import game.Map;
 import game.Player;
@@ -49,7 +49,7 @@ public class Enemy extends SeekerUnit {
 				minions.remove(entity);
 			}
 		});
-		OfflineGamePlayState.addEnemy(summon);
+		GamePlayStateInstance.INSTANCE.addEnemy(summon);
 	}
 	
 	public boolean canHaveMoreMinions(){
@@ -216,7 +216,7 @@ public class Enemy extends SeekerUnit {
 	public void DEBUGPingLocation(Point location) {
 		Point effectLocation = new Point(location.x * Map.getTileWidth() + 20,
 				location.y * Map.getTileHeight() + 20);
-		OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(effectLocation, ResourceLoader
+		GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(effectLocation, ResourceLoader
 				.createTileScaledAnimation(false, 100, "bubble2.png",
 						"bubble.png")));
 	}

@@ -344,7 +344,7 @@ public abstract class Entity implements VisibleObject {
 	private void setHealth(int newHealth, boolean notifyListeners) {
 		int previousHealth = health;
 		health = newHealth;
-		if(notifyListeners){
+		if(notifyListeners && previousHealth != health){
 			for (EntityHealthListener listener : healthListeners) {
 				listener.healthChanged(this, previousHealth, newHealth);
 			}

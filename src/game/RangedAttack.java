@@ -56,7 +56,7 @@ public class RangedAttack extends Attack {
 		Projectile p = new Projectile(attacker.getPixelCenterLocation(),
 				target.getPixelCenterLocation(), projectileSpeed,
 				projectileSize, projectileColor);
-		OfflineGamePlayState.addProjectile(p);
+		GamePlayStateInstance.INSTANCE.addProjectile(p);
 	}
 
 }

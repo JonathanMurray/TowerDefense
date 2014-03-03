@@ -149,7 +149,7 @@ public class SplashScreenState extends BasicGameState {
 		
 		if(!wavesLoaded){
 			try {
-				gameplayState.setWaves(new Waves(loadWavesDataFromFile(Paths.WAVES_PATH)));
+				gameplayState.setWaves(new Waves(loadWavesDataFromFile(Paths.WAVES_PATH), gameplayState));
 				wavesLoaded = true;
 				return;
 			} catch (FileNotFoundException e) {

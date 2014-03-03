@@ -1,6 +1,6 @@
 package game.actions.effects;
 
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.Map;
 import game.Physics;
 import game.actions.Parameters;
@@ -42,9 +42,9 @@ public class TeleportToTarget implements Effect{
 					continue;
 				}
 			}
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
 			((Unit)actor).teleportToLocation(adjLocation.x, adjLocation.y);
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
 			return true;
 		}
 		return false;

@@ -80,12 +80,12 @@ public class OfflineGamePlayState extends GamePlayState{
 
 	private void setup(GameContainer container) {
 
-		System.out.println("GamePLayState.setup()");
+		System.out.println("OfflineGamePLayState.setup()");
 		HeroType heroType = HeroType.HERO;
 
-		HUD_keyChars keyChars = new HUD_keyChars(PlayerInputHandler.getStatChar(HeroStat.STRENGTH), PlayerInputHandler.getStatChar(HeroStat.DEXTERITY),
-				PlayerInputHandler.getStatChar(HeroStat.INTELLIGENCE), PlayerInputHandler.getAbilityChars(), PlayerInputHandler.getItemChars());
-		hud = new HUD(container, keyChars, Player.INSTANCE.getMaxLife(), HeroInfo.MAX_ABILITIES, HeroInfo.MAX_USABLE_ITEMS);
+		HUD_keyChars keyChars = new HUD_keyChars(OfflinePlayerInputHandler.getStatChar(HeroStat.STRENGTH), OfflinePlayerInputHandler.getStatChar(HeroStat.DEXTERITY),
+				OfflinePlayerInputHandler.getStatChar(HeroStat.INTELLIGENCE), OfflinePlayerInputHandler.getAbilityChars(), OfflinePlayerInputHandler.getItemChars());
+		hud = new HUD(container, keyChars, Player.MAX_LIFE, HeroInfo.MAX_ABILITIES, HeroInfo.MAX_USABLE_ITEMS);
 
 		HeroInfo.INSTANCE.addListener(hud);
 		HeroInfo.INSTANCE.setup(this, heroType, HERO_SPAWN, hud);
@@ -95,7 +95,7 @@ public class OfflineGamePlayState extends GamePlayState{
 
 		hud.addInputListener(HeroInfo.INSTANCE);
 		hud.addInputListener(Player.INSTANCE);
-		hud.addInputListener(PlayerInputHandler.INSTANCE);
+		hud.addInputListener(OfflinePlayerInputHandler.INSTANCE);
 
 		Sounds.mute(true); // TODO
 		// Sounds.musicVolume = 0;
@@ -265,9 +265,9 @@ public class OfflineGamePlayState extends GamePlayState{
 		HeroInfo.INSTANCE.update(delta);
 		addVisibleObjects();
 
-		PlayerInputHandler.handleKeyboardInput(container.getInput(), delta, hud);
+		OfflinePlayerInputHandler.handleKeyboardInput(container.getInput(),  hud);
 		if (!hud.isMouseOverHUDElements(container.getInput())) {
-			PlayerInputHandler.handleMouseInput(container.getInput(), delta, hud);
+			OfflinePlayerInputHandler.handleMouseInput(container.getInput(), delta, hud);
 		}
 		hud.handleInput(container.getInput());
 
@@ -275,7 +275,7 @@ public class OfflineGamePlayState extends GamePlayState{
 		Entities.handleMouseOverEnemyInput(container.getInput(), delta, hud);
 	}
 
-	public static void notifyHeroRespawned(Hero hero) {
+	public void notifyHeroRespawned(Hero hero) {
 		visibleObjects.add(hero);
 	}
 
@@ -283,31 +283,31 @@ public class OfflineGamePlayState extends GamePlayState{
 	// visibleObjects.add(item);
 	// }
 
-	public static void addTower(Tower tower) {
+	public void addTower(Tower tower) {
 		visibleObjects.add(tower);
 		Player.INSTANCE.notifyTowerWasAdded(tower);
 		tower.notifyBirth();
 	}
 
-	public static void addSuperTower(SuperTower superTower) {
+	public void addSuperTower(SuperTower superTower) {
 		visibleObjects.add(superTower);
 		Player.INSTANCE.notifySuperTowerWasAdded(superTower);
 		superTower.notifyBirth();
 	}
 
-	public static void addEnemy(Enemy enemy) {
+	public void addEnemy(Enemy enemy) {
 		objectsToBeAdded.add(enemy);
 	}
 
-	public static void addProjectile(Projectile projectile) {
+	public void addProjectile(Projectile projectile) {
 		objectsToBeAdded.add(projectile);
 	}
 
-	public static void addSpecialEffect(VisualEffect specialEffect) {
+	public void addSpecialEffect(VisualEffect specialEffect) {
 		objectsToBeAdded.add(specialEffect);
 	}
 
-	static void giveRewardForWave(int waveNumber) {
+	public void giveRewardForWave(int waveNumber) {
 
 		WaveReward reward = LoadedData.getWaveReward(waveNumber);
 		Player.INSTANCE.gainMoney(reward.money);
@@ -466,5 +466,11 @@ public class OfflineGamePlayState extends GamePlayState{
 			object.renderExtraVisuals(g);
 		}
 	}
+
+	@Override
+	public void setAllowedToRun(boolean b) {
+		//This is only for server version of gameplaystate
+	}
+
 
 }

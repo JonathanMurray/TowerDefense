@@ -1,7 +1,7 @@
 package game.actions.targetPickers;
 
 import game.Entities;
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.Physics;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
@@ -40,12 +40,12 @@ public class TargetOneInFront implements TargetPicker{
 		if(targets.size() == 0){
 			Point oneAhead = Physics.getRelativeLocation(actor.getLocation(), ((Unit)actor).getDirection(), 1);
 			if(animation != null){
-				OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(oneAhead, animation));
+				GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(oneAhead, animation));
 			}
 			return new Entity[0];
 		}else{
 			if(animation != null){
-				OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(targets.get(0), animation));
+				GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(targets.get(0), animation));
 			}
 			return targets.subList(0, 1).toArray(new Entity[0]);
 		}

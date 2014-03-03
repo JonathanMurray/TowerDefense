@@ -8,6 +8,8 @@ import org.newdawn.slick.gui.GUIContext;
 import applicationSpecific.TowerType;
 
 class TowerButtonRow extends ButtonRow {
+	
+	boolean hasAddedSomeTowerButton = false;
 
 	TowerButtonRow(GUIContext container, Rectangle firstButtonRect, int buttonGap, int numberOfButtons) {
 		super(container, firstButtonRect, buttonGap, numberOfButtons);
@@ -19,6 +21,7 @@ class TowerButtonRow extends ButtonRow {
 		button.addListener(this);
 		addButton(button);
 		button.setUnlockAreaActive(button.getTowerData().unlockCost <= money);
+		hasAddedSomeTowerButton = true;
 	}
 	
 	private int money;

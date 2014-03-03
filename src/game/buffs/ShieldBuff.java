@@ -1,7 +1,7 @@
 package game.buffs;
 
-import game.OfflineGamePlayState;
 import game.EntityHealthListener;
+import game.GamePlayStateInstance;
 import game.ResourceLoader;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
@@ -53,7 +53,7 @@ public class ShieldBuff extends Buff implements EntityHealthListener {
 			entity.gainHealth(Math.min(damageTaken, remainingShield));
 			remainingShield -= damageTaken;
 
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(entity
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(entity
 					.getPixelCenterLocation(), ResourceLoader
 					.createTileScaledAnimation(false, "abilities/bubble.png")));
 			if (remainingShield <= 0) {

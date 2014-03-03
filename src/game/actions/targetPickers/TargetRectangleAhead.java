@@ -1,7 +1,7 @@
 package game.actions.targetPickers;
 
 import game.Entities;
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.Physics;
 import game.actions.ParameterName;
 import game.actions.Parameters;
@@ -49,7 +49,7 @@ public class TargetRectangleAhead implements TargetPicker {
 				try {
 					Point targetLocation = Physics.getRelativeLocation(actor.getLocation(), ((Unit)actor).getDirection(), stepsForward, stepsRight);
 					if(renderAnimations && animation != null){
-						OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect( Physics.getPixelCenterLocation(targetLocation),animation));
+						GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect( Physics.getPixelCenterLocation(targetLocation),animation));
 					}	
 					Entity target = Entities.getEntityOnLocation(targetLocation, targetTeam);
 					targets.add(target);

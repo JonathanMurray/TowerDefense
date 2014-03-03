@@ -8,6 +8,10 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import messages.IntMessageData;
+import messages.Message;
+import messages.MessageType;
+
 import org.newdawn.slick.Input;
 
 import rendering.HUD;
@@ -17,7 +21,7 @@ import applicationSpecific.ItemType;
 import applicationSpecific.SuperTowerType;
 import applicationSpecific.TowerType;
 
-public class Player implements HUD_InputListener{
+public class Player implements MessageListener{
 	private int money;
 
 	private ArrayList<Tower> towers = new ArrayList<Tower>();
@@ -25,7 +29,7 @@ public class Player implements HUD_InputListener{
 
 	private ArrayList<TechUpgrade> upgrades = new ArrayList<TechUpgrade>();
 
-	private final int MAX_ITEMS = 6;
+	public static final int MAX_ITEMS = 6;
 
 	private final TowerType[] INIT_AVAILABLE_TOWERS = new TowerType[] { TowerType.DROWSER};
 	private final TowerType[] INIT_UNLOCKED_TOWERS = new TowerType[] { TowerType.DROWSER };
@@ -34,7 +38,7 @@ public class Player implements HUD_InputListener{
 
 	private SoundWrapper LOSE_LIFE_SOUND;
 
-	private int MAX_LIFE = 10;
+	public static int MAX_LIFE = 10;
 	private int life;
 
 	private ArrayList<TowerType> availableTowers = new ArrayList<TowerType>();
@@ -42,7 +46,7 @@ public class Player implements HUD_InputListener{
 
 	private ArrayList<ItemType> availableItems = new ArrayList<ItemType>();
 
-	private ArrayList<PlayerListener> listeners = new ArrayList<PlayerListener>();
+	private ArrayList<MessageListener> listeners = new ArrayList<MessageListener>();
 
 	private GamePlayState gameplayState;
 
@@ -62,8 +66,8 @@ public class Player implements HUD_InputListener{
 	
 	private void setMoney(int amount){
 		money = amount;
-		for(PlayerListener listener : listeners){
-			listener.moneyWasUpdated(money);
+		for(MessageListener listener : listeners){
+			listener.messageReceived(new Message(MessageType.MONEY_WAS_UPDATED, new IntMessageData(money)));
 		}
 	}
 
@@ -121,7 +125,8 @@ public class Player implements HUD_InputListener{
 
 	private void buildSuperTower(Point location, SuperTowerType type) {
 		SuperTower superTower = new SuperTower(type, location, upgrades);
-		OfflineGamePlayState.addSuperTower(superTower);
+		//GamePlayStateInstance.INSTANCE.addSuperTower(superTower);
+		throw new IllegalStateException("Not yet implemented");
 	}
 
 	boolean hasSuperTower() {
@@ -137,7 +142,7 @@ public class Player implements HUD_InputListener{
 
 	private void buildTower(Point location, TowerType type) {
 		Tower tower = Tower.createTower(type, location, upgrades);
-		OfflineGamePlayState.addTower(tower);
+		GamePlayStateInstance.INSTANCE.addTower(tower);
 	}
 
 	void notifyTowerWasAdded(Tower tower) {
@@ -201,9 +206,6 @@ public class Player implements HUD_InputListener{
 		setLife(MAX_LIFE);
 	}
 
-	public int getMaxLife() {
-		return MAX_LIFE;
-	}
 
 	public int getLife() {
 		return life;
@@ -219,19 +221,19 @@ public class Player implements HUD_InputListener{
 	
 	private void setLife(int amount){
 		life = amount;
-		for(PlayerListener listener : listeners){
-			listener.playerLifeWasUpdated(life);
+		for(MessageListener listener : listeners){
+			listener.messageReceived(new Message(MessageType.PLAYER_LIFE_WAS_UPDATED, new IntMessageData(life)));
 		}
 	}
 
-	public void addListener(PlayerListener listener) {
+	public void addListener(MessageListener listener) {
 		listeners.add(listener);
 	}
 
 	public void addAvailableTower(TowerType towerType) {
 		availableTowers.add(towerType);
-		for (PlayerListener listener : listeners) {
-			listener.towerWasAdded(towerType);
+		for(MessageListener listener : listeners){
+			listener.messageReceived(new Message(MessageType.TOWER_WAS_ADDED, new IntMessageData(towerType.ordinal())));
 		}
 	}
 
@@ -251,8 +253,8 @@ public class Player implements HUD_InputListener{
 			return;
 		}
 		unlockedTowers.add(towerType);
-		for (PlayerListener listener : listeners) {
-			listener.towerWasUnlocked(towerType);
+		for(MessageListener listener : listeners){
+			listener.messageReceived(new Message(MessageType.TOWER_WAS_UNLOCKED, new IntMessageData(towerType.ordinal())));
 		}
 	}
 	
@@ -267,51 +269,42 @@ public class Player implements HUD_InputListener{
 			removedItem = availableItems.remove(0);
 			System.out.println(removedItem + " was removed");
 		}
-		for (PlayerListener listener : listeners) {
-			if (removedItem != null) {
-				listener.itemWasRemoved(removedItem);
+		for(MessageListener listener : listeners){
+			if(removedItem != null){
+				listener.messageReceived(new Message(MessageType.ITEM_WAS_REMOVED, new IntMessageData(removedItem.ordinal())));
 			}
-			listener.itemWasAdded(itemType);
+			listener.messageReceived(new Message(MessageType.ITEM_WAS_ADDED, new IntMessageData(itemType.ordinal())));
 		}
+		
+		
 	}
 
 	public void removeAvailableItem(ItemType itemType) {
 		availableItems.remove(itemType);
-		for (PlayerListener listener : listeners) {
-			listener.itemWasRemoved(itemType);
+		for(MessageListener listener : listeners){
+			listener.messageReceived(new Message(MessageType.ITEM_WAS_REMOVED, new IntMessageData(itemType.ordinal())));
 		}
 	}
 
+
 	@Override
-	public void pressedBuyItem(ItemType itemType) {
-		ItemData itemStats = LoadedData.getItemData(itemType);
-		if (HeroInfo.INSTANCE.isHeroAlive()) {
-			if (money >= itemStats.buyCost && HeroInfo.INSTANCE.hasSpaceForItem(itemType) && gameplayState.isHeroAliveAndCloseEnoughToMerchant()) {
-				HeroInfo.INSTANCE.equipItem(itemType);
-				loseMoney(itemStats.buyCost);
-				if (itemStats.isUnique) {
-					removeAvailableItem(itemType);
+	public void messageReceived(Message message) {
+		switch(message.type){
+		case PRESSED_BUY_ITEM:
+			ItemType itemType = ItemType.values()[message.getIntDataValue()];
+			ItemData itemStats = LoadedData.getItemData(itemType);
+			if (HeroInfo.INSTANCE.isHeroAlive()) {
+				if (money >= itemStats.buyCost && HeroInfo.INSTANCE.hasSpaceForItem(itemType) && gameplayState.isHeroAliveAndCloseEnoughToMerchant()) {
+					HeroInfo.INSTANCE.equipItem(itemType);
+					loseMoney(itemStats.buyCost);
+					if (itemStats.isUnique) {
+						removeAvailableItem(itemType);
+					}
 				}
 			}
+			break;
+			
 		}
-	}
-
-	@Override
-	public void towerSelected(TowerType towerType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void pressedReplaceAbility(AbilityType oldAbility, AbilityType newAbility) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void pressedAddAbility(AbilityType newAbility) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

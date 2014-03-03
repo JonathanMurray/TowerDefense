@@ -1,6 +1,6 @@
 package game.actions.effects;
 
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.Map;
 import game.Physics;
 import game.actions.ParameterName;
@@ -10,7 +10,6 @@ import game.objects.Entity;
 import game.objects.enemies.Enemy;
 
 import java.awt.Point;
-
 
 import org.newdawn.slick.Animation;
 
@@ -37,8 +36,8 @@ public class ReceiveSummonedMinion implements Effect{
 			if (!Map.instance().blockedForEnemy((Enemy) actor, summonLocation.x, summonLocation.y)) {
 				if(((Enemy)actor).canHaveMoreMinions()){
 					if(animation != null){
-						OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor.getPixelCenterLocation(), animation));
-						OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(Physics.getPixelCenterLocation(summonLocation), animation));
+						GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(actor.getPixelCenterLocation(), animation));
+						GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(Physics.getPixelCenterLocation(summonLocation), animation));
 					}
 					((Enemy)actor).receiveMinion(minionType, summonLocation);
 					return true;

@@ -1,21 +1,22 @@
 package game.buffs;
 
-import game.HeroInfoListener;
 import game.LoadedData;
+import game.MessageListener;
 import game.actions.Action;
 import game.actions.ContextParameterMap;
 import game.actions.ContextVariable;
 import game.actions.Parameters;
 import game.objects.Entity;
 import game.objects.HeroInfo;
-import game.objects.HeroStat;
+import messages.IntMessageData;
+import messages.Message;
+import messages.MessageType;
 
 import org.newdawn.slick.Animation;
 
 import applicationSpecific.AbilityType;
-import applicationSpecific.ItemType;
 
-public class ActionWhenSpendMana extends Buff implements HeroInfoListener{
+public class ActionWhenSpendMana extends Buff implements MessageListener{
 
 	private int duration;
 	private Action action;
@@ -62,95 +63,19 @@ public class ActionWhenSpendMana extends Buff implements HeroInfoListener{
 	}
 
 	@Override
-	public void abilityWasReplacedByNew(AbilityType oldAbility, AbilityType newAbility) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void abilityWasAdded(AbilityType newAbility) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void heroUsedAbility(AbilityType ability, int timeUntilCanUseAgain) {
-		System.out.println("ActionWhenSPendMana.heroUsedAbility");
-		int manaCost = LoadedData.getAbilityData(ability).manaCost;
-		Parameters parameters = contextParameterMap.getParameters(ContextVariable.MANA_CHANGE_AMOUNT, - manaCost);
-		carrier.performAction(action, parameters);
-		timesLeft --;
-		if(timesLeft <= 0){
-			HeroInfo.INSTANCE.removeListener(this);
-			carrier.loseBuff(this);
+	public void messageReceived(Message message) {
+		if(message.type == MessageType.HERO_USED_ABILITY){
+			System.out.println("ActionWhenSPendMana.heroUsedAbility");
+			AbilityType ability = AbilityType.values()[((IntMessageData)message.data).value];
+			int manaCost = LoadedData.getAbilityData(ability).manaCost;
+			Parameters parameters = contextParameterMap.getParameters(ContextVariable.MANA_CHANGE_AMOUNT, - manaCost);
+			carrier.performAction(action, parameters);
+			timesLeft --;
+			if(timesLeft <= 0){
+				HeroInfo.INSTANCE.removeListener(this);
+				carrier.loseBuff(this);
+			}
 		}
-		
 	}
 
-	@Override
-	public void itemWasReplacedByNew(int oldItemIndex, ItemType newItem) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void itemWasEquipped(ItemType newItem) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void itemWasDropped(int itemIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void heroStatChanged(HeroStat stat, int newValue) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void heroDied(int timeUntilResurrection) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void heroResurrected() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void numStatpointsChanged(int numAvailableStatpoints) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void heroHealthChanged(int newHealth, int maxHealth) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void heroUsedItem(int timeUntilCanUseAgain) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void heroManaChanged(int oldMana, int newMana, int maxMana) {
-		
-		
-	}
-
-	@Override
-	public void heroIsNowInRangeOfVendor(boolean isInRange) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 }

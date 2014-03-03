@@ -1,6 +1,9 @@
 package game;
 
 
+import java.awt.Dimension;
+import java.util.HashMap;
+
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Music;
@@ -12,6 +15,12 @@ import applicationSpecific.Paths;
 public class ResourceLoader {
 	
 	public static final int DEFAULT_FRAME_DURATION = 200;
+	
+	private static HashMap<Dimension, Image> BLANK_IMAGES = new HashMap<>();
+	static{
+		BLANK_IMAGES.put(new Dimension(64, 18), new Image(new EmptyImageData(64, 18)));
+		BLANK_IMAGES.put(new Dimension(10, 10), new Image(new EmptyImageData(10,10)));
+	}
 
 	public static SoundWrapper createSound(String soundRef, float volume) {
 		String path = Paths.SOUNDS_FILEPATH + soundRef;
@@ -52,12 +61,15 @@ public class ResourceLoader {
 	}
 
 	public static Image createScaledImage(String imgRef, int width, int height) {
+		
 		Image img = createImage(imgRef);
 		return img.getScaledCopy(width, height);
 	}
 
 	public static Image createBlankImage(int width, int height) {
-		return new Image(new EmptyImageData(width, height));
+		System.out.println("createBlankImage" + " " + width + "," + height);//TODO
+//		return new Image(new EmptyImageData(width, height));
+		return BLANK_IMAGES.get(new Dimension(width, height));
 	}
 
 	public static Animation createAnimation(boolean pingPong,

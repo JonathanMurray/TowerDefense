@@ -1,4 +1,16 @@
 ﻿
+Ändra listener-systemet så att man inte har 100tals metoder för olika "meddelande" mellan HeroInfo, Player, hud, osv.
+ANvänd istället klassen Message med tillhörande MessageType. Endast en ilstener behövs. "MessageListerner", istället för HeroInfoListemer
+HUDLIistener, osv...
+
+
+
+
+
+
+
+
+
 
 
 

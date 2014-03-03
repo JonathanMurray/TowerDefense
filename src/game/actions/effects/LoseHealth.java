@@ -1,16 +1,10 @@
 package game.actions.effects;
 
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.actions.ParameterName;
 import game.actions.Parameters;
-import game.buffs.StunWithImmunity;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
-import game.objects.HeroInfo;
-import game.objects.Unit;
-
-import java.util.Random;
-
 
 import org.newdawn.slick.Animation;
 
@@ -42,7 +36,7 @@ public class LoseHealth implements Effect {
 			target.loseHealth(multipliedDamage);
 		}
 		if(animation != null){
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
 		}
 		return true;
 	}

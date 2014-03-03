@@ -1,7 +1,7 @@
 package game.actions.targetPickers;
 
 import game.Entities;
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
@@ -34,7 +34,7 @@ public class TargetEntitiesInRange implements TargetPicker {
 			closeTargets.remove(actor);
 		}
 		if(renderAnimations && animation != null){
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
 		}
 		return closeTargets.toArray(new Entity[0]);
 	}

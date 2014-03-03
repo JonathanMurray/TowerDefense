@@ -1,12 +1,9 @@
 package game.objects;
 
 import game.EntityHealthListener;
-import game.Game;
 import game.GamePlayState;
-import game.OfflineGamePlayState;
-import game.HeroInfoListener;
-import game.ItemData;
 import game.LoadedData;
+import game.MessageListener;
 import game.ResourceLoader;
 import game.Sounds;
 import game.UnitMovementListener;
@@ -19,6 +16,12 @@ import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
+import messages.BoolMessageData;
+import messages.IntArrayMessageData;
+import messages.IntMessageData;
+import messages.Message;
+import messages.MessageType;
+
 import org.newdawn.slick.Graphics;
 
 import rendering.HUD;
@@ -28,7 +31,7 @@ import applicationSpecific.HeroType;
 import applicationSpecific.ItemType;
 import applicationSpecific.TowerType;
 
-public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMovementListener{
+public class HeroInfo implements MessageListener, EntityHealthListener, UnitMovementListener {
 
 	public final static int MAX_ABILITIES = 5;
 	public final static int MAX_USABLE_ITEMS = 5;
@@ -38,28 +41,27 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 	private final static int HERO_RESURRECTION_CD = 20000;
 
 	private ArrayList<AbilityType> abilities = new ArrayList<AbilityType>();
-//	private ArrayList<ItemType> equippedItems = new ArrayList<ItemType>();
+	// private ArrayList<ItemType> equippedItems = new ArrayList<ItemType>();
 	private Map<ItemType, Integer> equippedItems = new HashMap<ItemType, Integer>();
 	private HashMap<HeroStat, Integer> stats = new HashMap<HeroStat, Integer>();
 
 	private int experienceOnCurrentChunk;
 	private int statpointsToSpend;
 
-	private ArrayList<HeroInfoListener> listeners = new ArrayList<HeroInfoListener>();
-	private ArrayList<HeroInfoListener> listenersToBeRemoved = new ArrayList<HeroInfoListener>();
-	
+	private ArrayList<MessageListener> listeners = new ArrayList<MessageListener>();
+	private ArrayList<MessageListener> listenersToBeRemoved = new ArrayList<MessageListener>();
+
 	private AbilityPair[] abilityRewards;
 	private int nextAbilityRewardIndex = 0;
 	private GamePlayState gameplayState;
-	
+
 	public static HeroInfo INSTANCE = new HeroInfo();
-	
 
 	public void setup(GamePlayState gameplayState, HeroType type, Point heroSpawnLocation, EntityAttributeListener... heroAttributeListeners) {
 		this.gameplayState = gameplayState;
 		HeroData data = LoadedData.getHeroData(type);
 		hero = new Hero(type, data, heroSpawnLocation, heroAttributeListeners);
-		
+
 		initStatsMap();
 		setStat(HeroStat.STRENGTH, data.strength);
 		setStat(HeroStat.DEXTERITY, data.dexterity);
@@ -70,7 +72,7 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 		hero.gainFullHealth();
 		hero.gainFullMana();
 		hero.notifyBirth();
-		for(ItemType startItem : data.startItems){
+		for (ItemType startItem : data.startItems) {
 			equipItem(startItem);
 		}
 		addAbility(data.startAbilities.firstAbility);
@@ -87,8 +89,8 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 				hero.gainFullHealth();
 				hero.gainFullMana();
 				hero.notifyBirth();
-				for(HeroInfoListener listener : listeners){
-					listener.heroResurrected();
+				for (MessageListener listener : listeners) {
+					listener.messageReceived(new Message(MessageType.HERO_REVIVED));
 				}
 			}
 		}
@@ -100,9 +102,9 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 			hero.render(g);
 		}
 	}
-	
-	public void renderHeroExtraVisuals(Graphics g){
-		if(isHeroAlive()){
+
+	public void renderHeroExtraVisuals(Graphics g) {
+		if (isHeroAlive()) {
 			hero.renderExtraVisuals(g);
 		}
 	}
@@ -113,13 +115,13 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 
 	void notifyHeroDeath() {
 		timeUntilResurrection = HERO_RESURRECTION_CD;
-		for(HeroInfoListener listener : listeners){
-			listener.heroDied(timeUntilResurrection);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.HERO_DIED, new IntMessageData(timeUntilResurrection)));
 		}
 	}
-	
-	void notifyHeroStunned(boolean stunned){
-		
+
+	void notifyHeroStunned(boolean stunned) {
+
 	}
 
 	public Hero getHero() {
@@ -134,103 +136,100 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 		stats.put(HeroStat.DEXTERITY, 0);
 		stats.put(HeroStat.INTELLIGENCE, 0);
 	}
-	
-	private void handleRemoveListeners(){
-		for(HeroInfoListener listener : listenersToBeRemoved){
+
+	private void handleRemoveListeners() {
+		for (MessageListener listener : listenersToBeRemoved) {
 			listeners.remove(listener);
 		}
 		listenersToBeRemoved.clear();
 	}
 
-
-	public void addListener(HeroInfoListener listener) {
+	public void addListener(MessageListener listener) {
 		listeners.add(listener);
 		listenersToBeRemoved.remove(listener);
 	}
-	
-	public void removeListener(HeroInfoListener listener){
+
+	public void removeListener(MessageListener listener) {
 		listenersToBeRemoved.add(listener);
 	}
 
 	public void equipItem(ItemType newItem) {
-		if(equippedItems.containsKey(newItem)){
+		if (equippedItems.containsKey(newItem)) {
 			equippedItems.put(newItem, equippedItems.get(newItem) + 1);
-		}else{
+		} else {
 			equippedItems.put(newItem, 1);
 		}
-		
+
 		LoadedData.getItemData(newItem).wasEquipped(hero);
-		for (HeroInfoListener listener : listeners) {
-			listener.itemWasEquipped(newItem);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.ITEM_WAS_EQUIPPED, new IntMessageData(newItem.ordinal())));
 		}
 		if (equippedItems.size() > MAX_USABLE_ITEMS) {
 			throw new IllegalStateException("Too many abilities");
 		}
 	}
-	
-	public void dropItem(ItemType itemType){
+
+	public void dropItem(ItemType itemType) {
 		int itemIndex = HUD.instance().getNumberOfItem(itemType) - 1;
 		dropItemWithIndex(itemIndex);
 	}
 
-	public void dropItemWithIndex(int itemIndex){
+	public void dropItemWithIndex(int itemIndex) {
 		ItemType itemType = HUD.instance().getItemWithNumber(itemIndex + 1);
 		equippedItems.put(itemType, equippedItems.get(itemType) - 1);
-		if(equippedItems.get(itemType) == 0){
+		if (equippedItems.get(itemType) == 0) {
 			equippedItems.remove(itemType);
 		}
 		LoadedData.getItemData(itemType).wasDropped(hero);
-		for (HeroInfoListener listener : listeners) {
-			listener.itemWasDropped(itemIndex);
+		for (MessageListener listener : listeners) {
+			// listener.itemWasDropped(itemIndex);
+			listener.messageReceived(new Message(MessageType.ITEM_WAS_USED, new IntArrayMessageData(itemType.ordinal(), timeUntilResurrection)));
 		}
 	}
 
 	/*
-	 * public void replaceItemWithNew(int oldItemIndex,
-	 * EquippableItemType newItem){ equippedItems.remove(oldItemIndex);
-	 * equippedItems.add(newItem); for(HeroItemListener listener :
-	 * itemListeners){ listener.itemWasReplacedByNew(oldItemIndex, newItem); } }
+	 * public void replaceItemWithNew(int oldItemIndex, EquippableItemType
+	 * newItem){ equippedItems.remove(oldItemIndex); equippedItems.add(newItem);
+	 * for(HeroItemListener listener : itemListeners){
+	 * listener.itemWasReplacedByNew(oldItemIndex, newItem); } }
 	 */
 
 	public boolean hasSpaceForItem(ItemType item) {
 		return equippedItems.size() < MAX_USABLE_ITEMS || equippedItems.containsKey(item);
 	}
-	
 
+	// boolean hasMaxNumberOfAbilities() {
+	// return abilities.size() == MAX_ABILITIES;
+	// }
 
-//	boolean hasMaxNumberOfAbilities() {
-//		return abilities.size() == MAX_ABILITIES;
-//	}
-	
-	public void giveAbilityReward(){
-		if(nextAbilityRewardIndex < abilityRewards.length){
+	public void giveAbilityReward() {
+		if (nextAbilityRewardIndex < abilityRewards.length) {
 			gameplayState.offerHeroOneOfAbilities(abilityRewards[nextAbilityRewardIndex]);
-			nextAbilityRewardIndex ++;
+			nextAbilityRewardIndex++;
 		}
 	}
-	
-	
+
 	public void addAbility(AbilityType newAbility) {
 		if (abilities.contains(newAbility)) {
 			throw new IllegalArgumentException("Already has that ability");
 		}
 		abilities.add(newAbility);
-		for (HeroInfoListener listener : listeners) {
-			listener.abilityWasAdded(newAbility);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.ABILITY_WAS_ADDED, new IntMessageData(newAbility.ordinal())));
 		}
 		if (abilities.size() > MAX_ABILITIES) {
 			throw new IllegalStateException("Too many abilities");
 		}
 	}
 
-	public void replaceAbilityWithNew(AbilityType oldAbility,AbilityType newAbility) {
+	public void replaceAbilityWithNew(AbilityType oldAbility, AbilityType newAbility) {
 		if (abilities.contains(newAbility)) {
 			throw new IllegalArgumentException("Already has that ability");
 		}
 		abilities.remove(oldAbility);
 		abilities.add(newAbility);
-		for (HeroInfoListener listener : listeners) {
-			listener.abilityWasReplacedByNew(oldAbility, newAbility);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.ABILITY_WAS_REPLACED, new IntArrayMessageData(oldAbility.ordinal(), newAbility.ordinal())));
 		}
 	}
 
@@ -242,13 +241,13 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 			Sounds.play(ResourceLoader.createSound("powerup.wav", 2));
 		}
 		statpointsToSpend += chunksOf10;
-		for (HeroInfoListener listener : listeners) {
-			listener.numStatpointsChanged(statpointsToSpend);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.NUM_STATPOINTS_CHANGED, new IntMessageData(amount)));
 		}
 	}
-	
+
 	public void trySpendStatpointOn(HeroStat stat) {
-		if(statpointsToSpend > 0){
+		if (statpointsToSpend > 0) {
 			spendPointOnStat(stat);
 		}
 	}
@@ -268,8 +267,8 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 			System.exit(0);
 		}
 		stats.put(stat, newValue);
-		for(HeroInfoListener listener : listeners){
-			listener.heroStatChanged(stat, newValue);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.HERO_STAT_CHANGED, new IntArrayMessageData(stat.ordinal(), newValue)));
 		}
 	}
 
@@ -279,75 +278,65 @@ public class HeroInfo implements HUD_InputListener, EntityHealthListener, UnitMo
 		}
 		statpointsToSpend--;
 		addToStat(stat, 1);
-		for (HeroInfoListener listener : listeners) {
-			listener.numStatpointsChanged(statpointsToSpend);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.NUM_STATPOINTS_CHANGED, new IntMessageData(statpointsToSpend)));
+		}
+	}
+	
+
+	@Override
+	public void messageReceived(Message message) {
+		switch(message.type){
+		case PRESSED_REPLACE_ABILITY:
+			AbilityType oldAbility =AbilityType.values()[ message.getNthDataValue(0)];
+			AbilityType newAbility =AbilityType.values()[ message.getNthDataValue(1)];
+			replaceAbilityWithNew(oldAbility, newAbility);
+			break;
+		case PRESSED_ADD_ABILITY:
+			newAbility = AbilityType.values()[ message.getNthDataValue(1)];
+			addAbility(newAbility);
+			break;
 		}
 	}
 
-	@Override
-	public void pressedBuyItem(ItemType itemType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void towerSelected(TowerType towerType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void pressedUnlockTower(TowerType towerType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void pressedReplaceAbility(AbilityType oldAbility, AbilityType newAbility) {
-		replaceAbilityWithNew(oldAbility, newAbility);
-	}
-
 	void notifyHeroUsedItem(ItemType item, int timeUntilCanUseAgain) {
-		
-		
-		for(HeroInfoListener listener : listeners){
-			listener.heroUsedItem(timeUntilCanUseAgain);
+
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.ITEM_WAS_USED, new IntArrayMessageData(item.ordinal(), timeUntilCanUseAgain)));
 		}
 		dropItem(item);
 	}
 
 	@Override
 	public void healthChanged(Entity entity, int oldHealth, int newHealth) {
-		if(entity != hero){
+		if (entity != hero) {
 			throw new IllegalStateException("Why listen to other entities?");
 		}
-		for(HeroInfoListener listener : listeners){
-			listener.heroHealthChanged(newHealth, hero.maxHealth);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.HERO_HEALTH_CHANGED, new IntArrayMessageData(oldHealth, newHealth)));
 		}
 	}
 
 	void notifyHeroUsedAbility(AbilityType abilityType) {
-		for(HeroInfoListener listener : listeners){
-			listener.heroUsedAbility(abilityType, LoadedData.getAbilityData(abilityType).cooldown);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.HERO_USED_ABILITY, new IntArrayMessageData(abilityType.ordinal(), LoadedData
+					.getAbilityData(abilityType).cooldown)));
 		}
+
 	}
 
 	void notifyHeroManaChanged(int oldMana, int mana, boolean dueToUsedAbility, int maxMana) {
-		for(HeroInfoListener listener : listeners){
-			listener.heroManaChanged(oldMana, mana, maxMana);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.HERO_MANA_CHANGED, new IntArrayMessageData(oldMana, mana, maxMana)));
 		}
-	}
-
-	@Override
-	public void pressedAddAbility(AbilityType newAbility) {
-		addAbility(newAbility);
 	}
 
 	@Override
 	public void newLocation(int x, int y) {
 		boolean inRangeOfVendor = gameplayState.isHeroAliveAndCloseEnoughToMerchant();
-		for(HeroInfoListener listener : listeners){
-			listener.heroIsNowInRangeOfVendor(inRangeOfVendor);
+		for (MessageListener listener : listeners) {
+			listener.messageReceived(new Message(MessageType.HERO_IN_RANGE_OF_VENDOR, new BoolMessageData(inRangeOfVendor)));
 		}
 	}
+
 }

@@ -1,6 +1,6 @@
 package game.actions.effects;
 
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
@@ -32,7 +32,7 @@ public class ChangeMana implements Effect{
 		System.out.println("context sensitivie amount = " + amount + "\n");
 		((Hero)actor).addToMana(amount);
 		if(animation != null){
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
 		}
 		return true;
 	}

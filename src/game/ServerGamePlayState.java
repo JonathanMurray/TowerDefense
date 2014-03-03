@@ -16,15 +16,13 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import multiplayer.IdMessageData;
-import multiplayer.Message;
-import multiplayer.MessageType;
+import messages.Message;
+import messages.MessageType;
 import multiplayer.Server;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import rendering.HUD;
@@ -35,7 +33,7 @@ import applicationSpecific.HeroType;
 import applicationSpecific.ItemType;
 import applicationSpecific.TowerType;
 
-public class ServerGamePlayState extends GamePlayState implements PlayerListener, HeroInfoListener, HUD_InputListener{
+public class ServerGamePlayState extends GamePlayState implements MessageListener, HUD_InputListener{
 	
 	private static HUD hud;
 	
@@ -50,6 +48,8 @@ public class ServerGamePlayState extends GamePlayState implements PlayerListener
 	private static NeutralUnit merchant;
 	
 	private Server server;
+
+	private boolean allowedToRun;
 	
 	public ServerGamePlayState(Server server){
 		this.server = server;
@@ -68,10 +68,10 @@ public class ServerGamePlayState extends GamePlayState implements PlayerListener
 		System.out.println("ServerGamePlatyState.init");
 		HeroType heroType = HeroType.HERO;
 
-		HUD_keyChars keyChars = new HUD_keyChars(PlayerInputHandler.getStatChar(HeroStat.STRENGTH), PlayerInputHandler.getStatChar(HeroStat.DEXTERITY),
-				PlayerInputHandler.getStatChar(HeroStat.INTELLIGENCE), PlayerInputHandler.getAbilityChars(), PlayerInputHandler.getItemChars());
-		hud = new HUD(container, keyChars, Player.INSTANCE.getMaxLife(), HeroInfo.MAX_ABILITIES, HeroInfo.MAX_USABLE_ITEMS);
-
+		HUD_keyChars keyChars = new HUD_keyChars(OfflinePlayerInputHandler.getStatChar(HeroStat.STRENGTH), OfflinePlayerInputHandler.getStatChar(HeroStat.DEXTERITY),
+				OfflinePlayerInputHandler.getStatChar(HeroStat.INTELLIGENCE), OfflinePlayerInputHandler.getAbilityChars(), OfflinePlayerInputHandler.getItemChars());
+		hud = new HUD(container, keyChars, Player.MAX_LIFE, HeroInfo.MAX_ABILITIES, HeroInfo.MAX_USABLE_ITEMS);
+		server.notifyHUDCreated(hud);
 		
 		// This class acts as an additional listener that forwards important messages to the clients!
 		HeroInfo.INSTANCE.addListener(this);
@@ -85,7 +85,7 @@ public class ServerGamePlayState extends GamePlayState implements PlayerListener
 		hud.addInputListener(this);
 		hud.addInputListener(HeroInfo.INSTANCE);
 		hud.addInputListener(Player.INSTANCE);
-		hud.addInputListener(PlayerInputHandler.INSTANCE);
+		hud.addInputListener(OfflinePlayerInputHandler.INSTANCE);
 		//--------------------------------------------------------------------------------------------
 		
 
@@ -100,37 +100,34 @@ public class ServerGamePlayState extends GamePlayState implements PlayerListener
 
 		System.out.println("\n\n");
 		System.out.println("gameplaystate init done at " + System.currentTimeMillis());
+		
+		server.notifyClientsSetupDone();
 	}
 
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-		Sounds.update(delta);
-		hud.update(container.getInput(), delta);
-		waves.handleWaves(delta);
-		waves.handleInput(container.getInput());
-		updateAndRemoveObjects(delta);
-		HeroInfo.INSTANCE.update(delta);
-		addVisibleObjects();
-
-		PlayerInputHandler.handleKeyboardInput(container.getInput(), delta, hud);
-		if (!hud.isMouseOverHUDElements(container.getInput())) {
-			PlayerInputHandler.handleMouseInput(container.getInput(), delta, hud);
+		if(allowedToRun){
+			Sounds.update(delta);
+			hud.update(container.getInput(), delta);
+			waves.handleWaves(delta);
+			waves.handleInput(container.getInput());
+			updateAndRemoveObjects(delta);
+			HeroInfo.INSTANCE.update(delta);
+			addVisibleObjects();
 		}
-		hud.handleInput(container.getInput());
-
-		Player.INSTANCE.handleMouseOverTowerInput(container.getInput(), delta, hud);
-		Entities.handleMouseOverEnemyInput(container.getInput(), delta, hud);
 	}
 
 	@Override
 	public int getID() {
 		return OfflineGame.STATE_GAMEPLAY;
+	}
+	
+	public HUD getHUD(){
+		return hud;
 	}
 
 	
@@ -138,7 +135,7 @@ public class ServerGamePlayState extends GamePlayState implements PlayerListener
 		visibleObjects.add(hero);
 	}
 
-	public static void addTower(Tower tower) {
+	public void addTower(Tower tower) {
 		visibleObjects.add(tower);
 		Player.INSTANCE.notifyTowerWasAdded(tower);
 		tower.notifyBirth();
@@ -150,19 +147,19 @@ public class ServerGamePlayState extends GamePlayState implements PlayerListener
 		superTower.notifyBirth();
 	}
 
-	public static void addEnemy(Enemy enemy) {
+	public void addEnemy(Enemy enemy) {
 		objectsToBeAdded.add(enemy);
 	}
 
-	public static void addProjectile(Projectile projectile) {
+	public void addProjectile(Projectile projectile) {
 		objectsToBeAdded.add(projectile);
 	}
 
-	public static void addSpecialEffect(VisualEffect specialEffect) {
+	public void addSpecialEffect(VisualEffect specialEffect) {
 		objectsToBeAdded.add(specialEffect);
 	}
 
-	static void giveRewardForWave(int waveNumber) {
+	public void giveRewardForWave(int waveNumber) {
 
 		WaveReward reward = LoadedData.getWaveReward(waveNumber);
 		Player.INSTANCE.gainMoney(reward.money);
@@ -238,189 +235,52 @@ public class ServerGamePlayState extends GamePlayState implements PlayerListener
 	}
 
 
+	@Override
+	public void messageReceived(Message message) {
+		System.out.println("serverGPS received: " + message);
+		switch(message.type){
+		case TOWER_WAS_ADDED:	
+		case TOWER_WAS_UNLOCKED:
+		case ITEM_WAS_ADDED:
+		case ITEM_WAS_REMOVED:
+		case MONEY_WAS_UPDATED:
+		case PLAYER_LIFE_WAS_UPDATED:
+		case TOWER_WAS_SELECTED:
+		case ABILITY_WAS_REPLACED:
+		case ABILITY_WAS_ADDED:
+		case HERO_USED_ABILITY:
+		case HERO_DIED:
+		case HERO_IN_RANGE_OF_VENDOR:
+		case HERO_REVIVED:
+		case HERO_STAT_CHANGED:
+		case ITEM_WAS_DROPPED:
+		case ITEM_WAS_EQUIPPED:
+		case ITEM_WAS_REPLACED:
+		case ITEM_WAS_USED:
+		case NUM_STATPOINTS_CHANGED:
+		case HERO_HEALTH_CHANGED:
+		case HERO_MANA_CHANGED:
+			hud.messageReceived(message);
+			server.sendMessageToClients(message);
+			break;
+		case ADD_VISUAL_EFFECT:
+			break;
+		case CLIENT_PRESSED_KEYS:
+			break;
+		case CLIENT_READY:
+			break;
+
+		}
+	}
+
+
+	@Override
+	public void setAllowedToRun(boolean allowedToRun) {
+		this.allowedToRun = allowedToRun;
+	}
+
+
+
 	
-
-
-
-	@Override
-	public void towerWasAdded(TowerType towerType) {
-		server.sendMessageToClients(new Message(MessageType.TOWER_WAS_ADDED, new IdMessageData(towerType.ordinal())));
-		hud.towerWasAdded(towerType);
-		System.out.println("tower was added: " + towerType);
-	}
-	
-
-
-
-	@Override
-	public void towerWasUnlocked(TowerType towerType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void itemWasAdded(ItemType itemType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void itemWasRemoved(ItemType itemType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void moneyWasUpdated(int newAmount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void playerLifeWasUpdated(int newAmount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void pressedBuyItem(ItemType itemType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void towerSelected(TowerType towerType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void pressedUnlockTower(TowerType towerType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void pressedReplaceAbility(AbilityType oldAbility, AbilityType newAbility) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void pressedAddAbility(AbilityType newAbility) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void abilityWasReplacedByNew(AbilityType oldAbility, AbilityType newAbility) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void abilityWasAdded(AbilityType newAbility) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void heroUsedAbility(AbilityType ability, int timeUntilCanUseAgain) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void itemWasReplacedByNew(int oldItemIndex, ItemType newItem) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void itemWasEquipped(ItemType newItem) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void itemWasDropped(int itemIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void heroStatChanged(HeroStat stat, int newValue) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void heroDied(int timeUntilResurrection) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void heroResurrected() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void numStatpointsChanged(int numAvailableStatpoints) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void heroHealthChanged(int newHealth, int maxHealth) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void heroUsedItem(int timeUntilCanUseAgain) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void heroManaChanged(int oldMana, int newMana, int maxMana) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void heroIsNowInRangeOfVendor(boolean isInRange) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

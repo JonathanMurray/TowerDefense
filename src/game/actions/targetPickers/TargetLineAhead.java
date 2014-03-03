@@ -1,7 +1,7 @@
 package game.actions.targetPickers;
 
 import game.Entities;
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.Physics;
 import game.actions.ParameterName;
 import game.actions.Parameters;
@@ -83,7 +83,7 @@ public class TargetLineAhead implements TargetPicker {
 	private Entity getTargetOnLocation(Point location, boolean renderAnimations) {
 		try {
 			if(renderAnimations && animation != null){
-				OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(Physics.getPixelCenterLocation(location),animation));
+				GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(Physics.getPixelCenterLocation(location),animation));
 			}
 			return Entities.getEntityOnLocation(location, targetTeam);
 		} catch (EntityNotFound e) {

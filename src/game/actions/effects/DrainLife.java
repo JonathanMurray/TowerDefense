@@ -1,11 +1,10 @@
 package game.actions.effects;
 
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
-import game.objects.HeroInfo;
 
 import org.newdawn.slick.Animation;
 
@@ -32,8 +31,8 @@ public class DrainLife implements Effect {
 		target.loseHealthIgnoringArmor(multipliedDamage);
 		actor.gainHealth(healthAmount);
 		if(animation != null){
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(target, animation));
 		}
 		return true;
 	}

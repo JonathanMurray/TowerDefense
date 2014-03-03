@@ -2,6 +2,7 @@ package rendering;
 
 import game.HeroInfoListener;
 import game.LoadedData;
+import game.MessageListener;
 import game.OfflineGame;
 import game.PlayerListener;
 import game.ResourceLoader;
@@ -19,6 +20,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import messages.IntArrayMessageData;
+import messages.IntMessageData;
+import messages.Message;
+import messages.MessageType;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -31,7 +37,7 @@ import applicationSpecific.AbilityType;
 import applicationSpecific.ItemType;
 import applicationSpecific.TowerType;
 
-public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener, EntityAttributeListener{
+public class HUD implements  ButtonRowListener, EntityAttributeListener, MessageListener{
 
 	private Font f = new Font("Verdana", Font.BOLD, 32);
 	private TrueTypeFont bigFont = new TrueTypeFont(f, true);
@@ -99,7 +105,7 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 	private double heroPartMana;
 	private int maxAbilities;
 	private int maxItems;
-	private List<HUD_InputListener> listeners = new ArrayList<>();
+	private List<MessageListener> listeners = new ArrayList<>();
 
 	public HUD(GUIContext container, HUD_keyChars keyChars, int maxLife, int maxAbilities, int maxItems) {
 		this.container = container;
@@ -120,9 +126,12 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 		
 	}
 
-	public void addInputListener(HUD_InputListener listener) {
+	public void addInputListener(MessageListener listener) {
 		listeners.add(listener);
-		listener.towerSelected(buyTowerButtons.getTowerOfButtonWithIndex(selectedTowerIndex));
+		if(buyTowerButtons.hasAddedSomeTowerButton){
+			TowerType selectedTower = buyTowerButtons.getTowerOfButtonWithIndex(selectedTowerIndex) ;
+			listener.messageReceived(new Message(MessageType.TOWER_WAS_SELECTED, new IntMessageData(selectedTower.ordinal())));
+		}
 	}
 
 	public static HUD instance() {
@@ -199,8 +208,8 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 		dialog.setListener(new DialogListener() {
 			public void choiceWasMade(int choiceIndex) {
 				AbilityType oldAbility = abilities.get(choiceIndex);
-				for(HUD_InputListener listener : listeners){
-					listener.pressedReplaceAbility(oldAbility, abilityToReplaceOld);
+				for(MessageListener listener : listeners){
+					listener.messageReceived(new Message(MessageType.PRESSED_REPLACE_ABILITY, new IntArrayMessageData(oldAbility.ordinal(), abilityToReplaceOld.ordinal())));
 				}
 				isChoosingAbility = false;
 			}
@@ -238,24 +247,6 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 		});
 	}
 
-//	public void addSuperTowerDialog(SuperTowerType[] superTowers) {
-//		DialogChoice[] choices = new DialogChoice[superTowers.length];
-//		for (int i = 0; i < superTowers.length; i++) {
-//			choices[i] = new DialogChoice(superTowers[i]);
-//		}
-//		Dialog dialog = MouseDialog.createDialog(this, container, "Choose tower:", new Point(800, 400), choices);
-//		dialogs.add(dialog);
-//		dialog.setListener(new DialogListener() {
-//			public void choiceWasMade(int choiceIndex) {
-//				Player.tryToBuildSuperTowerAtLocation(SuperTowerType.values()[choiceIndex], new Point(15, 17));
-//			}
-//
-//			public void mouseOverChoice(int choiceIndex) {
-//				// addTooltip(buttonTopLeft, text)
-//			}
-//		});
-//	}
-
 	public void handleInput(Input input) {
 		handleUpcomingAbility();
 		boolean isMousePressed = input.isMousePressed(0);
@@ -275,15 +266,15 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 			if(((TowerButton)sourceButton).isActive){
 				selectedTowerIndex = buttonIndex;
 				TowerType tower = buyTowerButtons.getTowerOfButtonWithIndex(selectedTowerIndex);
-				for(HUD_InputListener listener : listeners){
-					listener.towerSelected(tower);
+				for(MessageListener listener : listeners){
+					listener.messageReceived(new Message(MessageType.TOWER_WAS_SELECTED, new IntMessageData(tower.ordinal())));
 				}
 			}
 			
 		} else if (sourceRow == vendorButtons) {
 			ItemType item = vendorButtons.getItemOfButtonWithIndex(buttonIndex);
-			for(HUD_InputListener listener : listeners){
-				listener.pressedBuyItem(item);
+			for(MessageListener listener : listeners){
+				listener.messageReceived(new Message(MessageType.PRESSED_BUY_ITEM, new IntMessageData(item.ordinal())));
 			}
 		}
 	}
@@ -293,8 +284,9 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 		if(sourceRow != buyTowerButtons){
 			throw new IllegalStateException("Only tower row has unlock");
 		}
-		for(HUD_InputListener listener : listeners){
-			listener.pressedUnlockTower(((TowerButton)sourceButton).getTowerType());
+		TowerType tower = ((TowerButton)sourceButton).getTowerType();
+		for(MessageListener listener : listeners){
+			listener.messageReceived(new Message(MessageType.PRESSED_UNLOCK_TOWER, new IntMessageData(tower.ordinal())));
 		}
 	}
 
@@ -337,58 +329,123 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 	public int getNumberOfItem(ItemType itemType){
 		return itemButtons.getNumberOfItem(itemType);
 	}
-
+	
 	@Override
-	public void abilityWasReplacedByNew(AbilityType oldAbility, AbilityType newAbility) {
-		abilities.set(abilities.indexOf(oldAbility), newAbility);
-		abilityButtons.replaceAbilityWithNew(oldAbility, newAbility);
+	public void messageReceived(Message message) {
+		System.out.println("hud received msg:  " + message);
+		switch(message.type){
+		case HERO_IN_RANGE_OF_VENDOR:
+			vendorButtons.heroIsNowInRangeOfVendor(message.getBoolDataValue());
+			break;
+			
+		case HERO_REVIVED:
+			abilityButtons.heroResurrected();
+			itemButtons.heroResurrected();
+			isHeroDead = false;
+			break;
+			
+		case HERO_MANA_CHANGED:
+			int newMana = message.getNthDataValue(1);
+			int maxMana = message.getNthDataValue(2);
+			abilityButtons.notifyHeroManaChanged(newMana);
+			heroPartMana = newMana / (double)maxMana;
+			break;
+			
+		case MONEY_WAS_UPDATED:
+			int newAmount = message.getIntDataValue();
+			this.money = newAmount;
+			buyTowerButtons.setMoney(newAmount);
+			vendorButtons.setMoney(newAmount);
+			break;
+			
+		case PLAYER_LIFE_WAS_UPDATED:
+			this.life = message.getIntDataValue();
+			break;
+			
+		case HERO_STAT_CHANGED:
+			HeroStat stat = HeroStat.values()[message.getNthDataValue(0)];
+			int newValue = message.getNthDataValue(1);
+			heroStats.put(stat, newValue);
+			break;
+			
+		case HERO_DIED:
+			int timeUntilResurrection = message.getIntDataValue();
+			timeUntilHeroResurrection = timeUntilResurrection;
+			isHeroDead = true;
+			abilityButtons.heroDied();
+			itemButtons.heroDied();
+			break;
+			
+		case NUM_STATPOINTS_CHANGED:
+			int numAvailableStatpoints = message.getIntDataValue();
+			this.numAvailableStatpoints = numAvailableStatpoints;
+			for(Button b : statButtons.buttons){
+				b.setActive(numAvailableStatpoints > 0);
+			}
+			break;
+			
+		case ITEM_WAS_USED:
+			int timeUntilCanUseAgain = message.getNthDataValue(1);
+			timeUntilCanUseItemAgain = timeUntilCanUseAgain;
+			itemButtons.itemWasUsed(timeUntilCanUseAgain);
+			break;
+			
+		case HERO_HEALTH_CHANGED:
+			int newHealth = message.getNthDataValue(0);
+			int maxHealth = message.getNthDataValue(1);
+			heroPartHealth = newHealth / (double) maxHealth;
+			break;
+			
+		case HERO_USED_ABILITY:
+			AbilityType abilityType = AbilityType.values()[message.getNthDataValue(0)];
+			timeUntilCanUseAgain = message.getNthDataValue(1);
+			abilityButtons.abilityWasUsed(abilityType, timeUntilCanUseAgain);
+			break;
+			
+		case ABILITY_WAS_REPLACED:
+			AbilityType oldAbility = AbilityType.values()[message.getNthDataValue(0)];
+			AbilityType newAbility = AbilityType.values()[message.getNthDataValue(1)];
+			abilities.set(abilities.indexOf(oldAbility), newAbility);
+			abilityButtons.replaceAbilityWithNew(oldAbility, newAbility);
+			break;
+			
+		case ABILITY_WAS_ADDED:
+			newAbility = AbilityType.values()[message.getIntDataValue()];
+			abilities.add(newAbility);
+			abilityButtons.addAbilityButton(newAbility, keyChars.abilities);
+			break;
+		
+		case TOWER_WAS_ADDED:
+			buyTowerButtons.addTowerButton(TowerType.values()[message.getIntDataValue()]);
+			break;
+			
+		case TOWER_WAS_UNLOCKED:
+			buyTowerButtons.unlockTower(TowerType.values()[message.getIntDataValue()]);
+			break;
+			
+		case ITEM_WAS_ADDED:
+			vendorButtons.addVendorButton(ItemType.values()[message.getIntDataValue()]);
+			break;
+			
+		case ITEM_WAS_REMOVED:
+			vendorButtons.removeVendorButton(ItemType.values()[message.getIntDataValue()]);
+			break;
+			
+		case ITEM_WAS_EQUIPPED:
+			itemButtons.itemWasAdded(ItemType.values()[message.getIntDataValue()], keyChars.items);
+			break;
+			
+		case ITEM_WAS_REPLACED:
+			int oldItemIndex = message.getNthDataValue(0);
+			ItemType newItem = ItemType.values()[message.getNthDataValue(1)];
+			itemButtons.replaceItemWithNew(oldItemIndex, newItem);
+			break;
+			
+		case ITEM_WAS_DROPPED:
+			itemButtons.itemWasDropped(message.getIntDataValue());
+		}
 	}
 
-	@Override
-	public void abilityWasAdded(AbilityType newAbility) {
-		abilities.add(newAbility);
-		abilityButtons.addAbilityButton(newAbility, keyChars.abilities);
-	}
-
-//	public TowerType getSelectedTower() {
-//		return (TowerType) buyTowerButtons.getTowerOfButtonWithIndex(selectedTowerIndex);
-//	}
-
-	@Override
-	public void towerWasAdded(TowerType towerType) {
-		buyTowerButtons.addTowerButton(towerType);
-	}
-
-	@Override
-	public void towerWasUnlocked(TowerType towerType) {
-		buyTowerButtons.unlockTower(towerType);
-	}
-
-	@Override
-	public void itemWasAdded(ItemType potionType) {
-		vendorButtons.addVendorButton(potionType);
-	}
-
-	@Override
-	public void itemWasRemoved(ItemType itemType) {
-		vendorButtons.removeVendorButton(itemType);
-	}
-
-	@Override
-	public void itemWasEquipped(ItemType newItem) {
-//		addItemAtFirstNullIndex(newItem);
-		itemButtons.itemWasAdded(newItem, keyChars.items);
-	}
-
-	@Override
-	public void itemWasReplacedByNew(int oldItemIndex, ItemType newItem) {
-		itemButtons.replaceItemWithNew(oldItemIndex, newItem);
-	}
-
-	@Override
-	public void itemWasDropped(int itemIndex) {
-		itemButtons.itemWasDropped(itemIndex);
-	}
 
 	public void abilityKeyWasPressed(int abilityNumber) {
 		abilityButtons.flashButton(abilityNumber);
@@ -562,9 +619,10 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 			if(numAbilities == maxAbilities){
 				addAbilitySwapDialog(upcomingAbility);
 			}else{
-				for(HUD_InputListener listener : listeners){
-					listener.pressedAddAbility(upcomingAbility);
+				for(MessageListener listener : listeners){
+					listener.messageReceived(new Message(MessageType.PRESSED_ADD_ABILITY, new IntMessageData(upcomingAbility.ordinal())));
 				}
+				
 			}
 			upcomingAbility = null;
 		}
@@ -585,46 +643,8 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 //		Rectangle tooltipRect = new Rectangle((int) towerTopLeft.getX() - 31, (int) towerTopLeft.getY() - height - space, width, height);
 //		return new TextBox(tooltipRect, text);
 //	}
-
-	@Override
-	public void moneyWasUpdated(int newAmount) {
-		this.money = newAmount;
-		buyTowerButtons.setMoney(newAmount);
-		vendorButtons.setMoney(newAmount);
-	}
-
-	@Override
-	public void playerLifeWasUpdated(int newAmount) {
-		this.life = newAmount;
-	}
-
-	@Override
-	public void heroStatChanged(HeroStat stat, int newValue) {
-		heroStats.put(stat, newValue);
-	}
-
-	@Override
-	public void heroDied(int timeUntilResurrection) {
-		timeUntilHeroResurrection = timeUntilResurrection;
-		isHeroDead = true;
-		abilityButtons.heroDied();
-		itemButtons.heroDied();
-	}
-
 	
-	@Override
-	public void numStatpointsChanged(int numAvailableStatpoints) {
-		this.numAvailableStatpoints = numAvailableStatpoints;
-		for(Button b : statButtons.buttons){
-			b.setActive(numAvailableStatpoints > 0);
-		}
-	}
-
-	@Override
-	public void heroUsedItem(int timeUntilCanUseAgain) {
-		timeUntilCanUseItemAgain = timeUntilCanUseAgain;
-		itemButtons.itemWasUsed(timeUntilCanUseAgain);
-	}
+	
 
 	@Override
 	public void entityAttributeChanged(Entity entity, EntityAttribute attribute, double newValue) {
@@ -654,34 +674,10 @@ public class HUD implements HeroInfoListener, ButtonRowListener, PlayerListener,
 		}
 	}
 
-	@Override
-	public void heroHealthChanged(int newHealth, int maxHealth) {
-		heroPartHealth = newHealth / (double) maxHealth;
-		
-	}
 
-	@Override
-	public void heroUsedAbility(AbilityType abilityType, int timeUntilCanUseAgain) {
-		abilityButtons.abilityWasUsed(abilityType, timeUntilCanUseAgain);
-	}
-
-	@Override
-	public void heroManaChanged(int oldMana, int newMana, int maxMana) {
-		abilityButtons.notifyHeroManaChanged(newMana);
-		heroPartMana = newMana / (double)maxMana;
-	}
-
-	@Override
-	public void heroResurrected() {
-		abilityButtons.heroResurrected();
-		itemButtons.heroResurrected();
-		isHeroDead = false;
-	}
-
-	@Override
-	public void heroIsNowInRangeOfVendor(boolean isInRange) {
-		vendorButtons.heroIsNowInRangeOfVendor(isInRange);
-	}
+	
+	
+	
 
 	
 

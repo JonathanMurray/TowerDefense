@@ -1,7 +1,7 @@
 package game.actions.targetPickers;
 
 import game.Entities;
-import game.OfflineGamePlayState;
+import game.GamePlayStateInstance;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
@@ -24,7 +24,7 @@ public class TargetAdjacentEntities implements TargetPicker{
 	@Override
 	public Entity[] pickTargets(Entity actor, boolean renderAnimation, Parameters parameters) {
 		if(renderAnimation && animation != null){
-			OfflineGamePlayState.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
+			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
 		}
 		return Entities.getEntitiesAdjacentTo(actor.getLocation(), targetTeam).toArray(new Entity[0]);
 	}

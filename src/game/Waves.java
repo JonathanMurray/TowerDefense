@@ -23,10 +23,12 @@ public class Waves {
 	private int waveIndex = 0;
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private boolean hasGivenRewardForCurrentWave = false;
+	private GamePlayState gameplayState;
 
-	public Waves(WavesData wavesData){
+	public Waves(WavesData wavesData, GamePlayState gameplayState){
 		this.waves = wavesData.waves;
 		this.secondsToWaitUntilFirstWave = wavesData.secondsToWaitUntilFirstWave;
+		this.gameplayState = gameplayState;
 	}
 	
 	public static class WavesData{
@@ -74,7 +76,7 @@ public class Waves {
 		}
 		removeDeadEnemies();
 		if (currentWaveHasBeenCleared() && !hasGivenRewardForCurrentWave) {
-			OfflineGamePlayState.giveRewardForWave(waveIndex + 1);
+			gameplayState.giveRewardForWave(waveIndex + 1);
 			hasGivenRewardForCurrentWave = true;
 			if (isFinalWave()) {
 				OfflineGame.winGame();
@@ -110,7 +112,7 @@ public class Waves {
 			return;
 		}
 		if (!hasGivenRewardForCurrentWave) {
-			OfflineGamePlayState.giveRewardForWave(waveIndex + 1);
+			gameplayState.giveRewardForWave(waveIndex + 1);
 		}
 		waveIndex++;
 		enemies.clear();
@@ -128,9 +130,9 @@ public class Waves {
 
 	private void spawnEnemy(EnemyType enemyData) {
 		Enemy heroEnemy = Enemy.constructEnemy(enemyData, LaneType.heroLane);
-		OfflineGamePlayState.addEnemy(heroEnemy);
+		gameplayState.addEnemy(heroEnemy);
 		Enemy tdEnemy = Enemy.constructEnemy(enemyData, LaneType.towerLane);
-		OfflineGamePlayState.addEnemy(tdEnemy);
+		gameplayState.addEnemy(tdEnemy);
 		enemies.add(heroEnemy);
 		enemies.add(tdEnemy);
 	}

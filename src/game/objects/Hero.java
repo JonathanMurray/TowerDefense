@@ -1,9 +1,9 @@
 package game.objects;
 
 import game.AbilityData;
-import game.HeroInfoListenerExtender;
 import game.LoadedData;
 import game.Map;
+import game.MessageListener;
 import game.Sounds;
 
 import java.awt.Dimension;
@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.naming.OperationNotSupportedException;
+
+import messages.IntMessageData;
+import messages.Message;
 
 import org.newdawn.slick.Graphics;
 
@@ -59,21 +62,28 @@ public class Hero extends StepperUnit {
 		
 		this.type = type;
 
-		HeroInfo.INSTANCE.addListener(new HeroInfoListenerExtender(){
+		HeroInfo.INSTANCE.addListener(new MessageListener() {
+			
 			@Override
-			public void abilityWasReplacedByNew(AbilityType oldAbility,	AbilityType newAbility) {
-				abilitiesWithTimeSinceUse.remove(oldAbility);
-				AbilityData stats = LoadedData.getAbilityData(newAbility);
-				abilitiesWithTimeSinceUse.put(newAbility, stats.cooldown); 
-			}
-
-			@Override
-			public void abilityWasAdded(AbilityType newAbility) {
-				AbilityData stats = LoadedData.getAbilityData(newAbility);
-				abilitiesWithTimeSinceUse.put(newAbility, stats.cooldown);
+			public void messageReceived(Message message) {
+				switch(message.type){
+				case ABILITY_WAS_REPLACED:
+					AbilityType oldAbility = AbilityType.values()[message.getNthDataValue(0)];
+					AbilityType newAbility = AbilityType.values()[message.getNthDataValue(1)];
+					abilitiesWithTimeSinceUse.remove(oldAbility);
+					AbilityData stats = LoadedData.getAbilityData(newAbility);
+					abilitiesWithTimeSinceUse.put(newAbility, stats.cooldown); 
+					break;
+				case ABILITY_WAS_ADDED:
+					IntMessageData d2 = (IntMessageData)message.data;
+					AbilityType ability = AbilityType.values()[d2.value];
+					stats = LoadedData.getAbilityData(ability);
+					abilitiesWithTimeSinceUse.put(ability, stats.cooldown);
+					break;
+				}
 			}
 		});
-		
+
 	}
 
 	@Override
@@ -168,7 +178,9 @@ public class Hero extends StepperUnit {
 			throw new IllegalArgumentException();
 		}
 		this.mana = mana;
-		HeroInfo.INSTANCE.notifyHeroManaChanged(oldMana, mana, false, maxMana);
+		if(mana != oldMana){
+			HeroInfo.INSTANCE.notifyHeroManaChanged(oldMana, mana, false, maxMana);
+		}
 	}
 
 	@Override
@@ -196,26 +208,6 @@ public class Hero extends StepperUnit {
 			return;
 		}
 	}
-	
-//	private void setAttribute(EntityAttribute attribute, double newValue){
-//
-//		switch (attribute) {
-//		case HEALTH_REGEN:
-//			healthRegenCooldown = (int) Math.round(newValue);
-//			break;
-//		case MANA_REGEN:
-//			manaRegenCooldown = (int) Math.round(newValue);
-//			break;
-//		case MAX_MANA:
-//			maxMana = (int) Math.round(newValue);
-//			break;
-//		default:
-//			throw new IllegalArgumentException
-//		}
-//		for(EntityAttributeListener listener : attributeListeners){
-//			listener.entityAttributeChanged(this, attribute, newValue);
-//		}
-//	}
 
 	@Override
 	public void update(int delta) {
@@ -229,25 +221,6 @@ public class Hero extends StepperUnit {
 			abilitiesWithTimeSinceUse.put(a, abilitiesWithTimeSinceUse.get(a) + delta);
 		}
 	}
-	
-	
-	
-	
-//	//A ilttle test to ensure looping functionality in update works
-//	Can be removed"!
-//	public static void main(String[] args) {
-//		HashMap<String, Integer> map = new HashMap<>();
-//		map.put("A", 0);
-//		map.put("B", 10);
-//		Iterator<String> it = map.keySet().iterator();
-//		while(it.hasNext()){
-//			String k = it.next();
-//			map.put(k, map.get(k) + 1);
-//		}
-//		
-//		System.out.println(map.get("A"));
-//		System.out.println(map.get("B"));
-//	}
 
 	private void handleManaRegen(int delta) {
 		timeSinceManaRegen += delta;
