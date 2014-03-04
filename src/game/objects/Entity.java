@@ -24,9 +24,14 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
 import rendering.RenderUtil;
+import rendering.OfflineRenderableEntity;
+import rendering.RenderableEntity;
 
 public abstract class Entity implements VisibleObject {
 
+	
+	protected RenderableEntity renderableEntity;
+	
 	protected int x;
 	protected int y;
 	private int baseMaxHealth;
@@ -82,6 +87,10 @@ public abstract class Entity implements VisibleObject {
 		for (EntityAttribute attribute : EntityAttribute.values()) {
 			attributeMultipliers.put(attribute, new HashMap<String, Double>());
 		}
+	}
+	
+	protected void setRenderableEntity(RenderableEntity renderableEntity){
+		this.renderableEntity = renderableEntity;
 	}
 
 	public abstract Team getTeam();
@@ -165,6 +174,10 @@ public abstract class Entity implements VisibleObject {
 	public void update(int delta) {
 		for (Buff buff : buffs) {
 			buff.update(this, delta);
+		}
+		
+		if(renderableEntity != null){
+			renderableEntity.update(delta);
 		}
 
 		handleAddBuffs();
@@ -350,6 +363,7 @@ public abstract class Entity implements VisibleObject {
 			}
 		}
 		
+		renderableEntity.setPercentHealth((int) (health / (float)maxHealth * 100));
 
 		if (health <= 0 && alive) {
 			die(true);
@@ -404,25 +418,32 @@ public abstract class Entity implements VisibleObject {
 
 	@Override
 	public void render(Graphics g) {
-		Point topLeft = getPixelLocation();
-		currentSprite.draw(topLeft.x, topLeft.y);
+		if(renderableEntity != null){
+			renderableEntity.render(g);
+		}
+		
+//		Point topLeft = getPixelLocation();
+//		currentSprite.draw(topLeft.x, topLeft.y);
 	}
 
 	@Override
 	public void renderExtraVisuals(Graphics g) {
-		renderStatBars(g);
-		for (Buff buff : buffs) {
-			if (buff.hasAnimation()) {
-				Image buffImage = buff.getCurrentFrame();
-				g.drawImage(buffImage, getPixelCenterLocation().x - buffImage.getWidth() / 2, getPixelCenterLocation().y - buffImage.getHeight() / 2);
-			}
+		if(renderableEntity != null){
+			renderableEntity.renderExtraVisuals(g);
 		}
+//		renderStatBars(g);
+//		for (Buff buff : buffs) {
+//			if (buff.hasAnimation()) {
+//				Image buffImage = buff.getCurrentFrame();
+//				g.drawImage(buffImage, getPixelCenterLocation().x - buffImage.getWidth() / 2, getPixelCenterLocation().y - buffImage.getHeight() / 2);
+//			}
+//		}
 	}
 
-	protected void renderStatBars(Graphics g) {
-		Point uiTopLeft = getPixelLocation();
-		uiTopLeft.translate(0, -9);
-		RenderUtil.renderHealthBar(g, uiTopLeft, new Dimension(Map.getTileWidth(), 6), (double) health / (double) maxHealth, 1);
-	}
+//	protected void renderStatBars(Graphics g) {
+//		Point uiTopLeft = getPixelLocation();
+//		uiTopLeft.translate(0, -9);
+//		RenderUtil.renderHealthBar(g, uiTopLeft, new Dimension(Map.getTileWidth(), 6), (double) health / (double) maxHealth, 1);
+//	}
 
 }

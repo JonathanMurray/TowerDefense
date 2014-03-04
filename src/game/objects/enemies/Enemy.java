@@ -22,6 +22,8 @@ import java.util.List;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
+import rendering.OfflineRenderableEntity;
+
 import applicationSpecific.EnemyType;
 
 public class Enemy extends SeekerUnit {
@@ -92,6 +94,7 @@ public class Enemy extends SeekerUnit {
 		if(stats.isImmuneToStun){
 			setCompletelyImmuneToStun();
 		}
+		setRenderableEntity(OfflineRenderableEntity.createEnemy(getPixelLocation(), stats.spriteSet, getDirection(),(int)(health/(float)maxHealth*100)));
 	}
 
 	private void setupData(EnemyData stats) {

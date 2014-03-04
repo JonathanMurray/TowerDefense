@@ -51,6 +51,8 @@ public enum MessageType implements Serializable{
 	
 	//Client input to server
 	CLIENT_PRESSED_KEYS,
+	CLIENT_PRESSED_LEFT_MOUSE,
+	CLIENT_PRESSED_RIGHT_MOUSE,
 	PRESSED_BUY_ITEM,
 	PRESSED_UNLOCK_TOWER,
 	PRESSED_REPLACE_ABILITY,

@@ -2,12 +2,11 @@ package game.objects;
 
 import game.AbilityData;
 import game.LoadedData;
-import game.Map;
 import game.MessageListener;
 import game.Sounds;
 
-import java.awt.Dimension;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -16,9 +15,9 @@ import javax.naming.OperationNotSupportedException;
 import messages.IntMessageData;
 import messages.Message;
 
-import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Animation;
 
-import rendering.RenderUtil;
+import rendering.OfflineRenderableEntity;
 import applicationSpecific.AbilityType;
 import applicationSpecific.HeroType;
 import applicationSpecific.ItemType;
@@ -39,16 +38,12 @@ public class Hero extends StepperUnit {
 	private int timeUntilItemReady = 0;
 
 	private HashMap<AbilityType, Integer> abilitiesWithTimeSinceUse = new HashMap<>();
-	
-	
-	
 
 	HeroType type;
 
 	public Hero(HeroType type, HeroData stats, Point location, EntityAttributeListener... attributeListeners) {
-		super(stats.baseHealth, stats.baseArmor, stats.spriteSet,
-				stats.idleFrameIndex, stats.baseMovementCooldown, location,
-				stats.birthSound, stats.deathSound, attributeListeners);
+		super(stats.baseHealth, stats.baseArmor, stats.spriteSet, stats.idleFrameIndex, stats.baseMovementCooldown, location, stats.birthSound,
+				stats.deathSound, attributeListeners);
 		baseMaxMana = stats.baseMana;
 		maxMana = baseMaxMana;
 		notifyListenersAttributeChanged(EntityAttribute.MAX_MANA, maxMana);
@@ -59,23 +54,23 @@ public class Hero extends StepperUnit {
 		healthRegenCooldown = stats.healthRegenCooldown;
 		baseHealthRegenCooldown = healthRegenCooldown;
 		notifyListenersAttributeChanged(EntityAttribute.HEALTH_REGEN, healthRegenCooldown);
-		
+
 		this.type = type;
 
 		HeroInfo.INSTANCE.addListener(new MessageListener() {
-			
+
 			@Override
 			public void messageReceived(Message message) {
-				switch(message.type){
+				switch (message.type) {
 				case ABILITY_WAS_REPLACED:
 					AbilityType oldAbility = AbilityType.values()[message.getNthDataValue(0)];
 					AbilityType newAbility = AbilityType.values()[message.getNthDataValue(1)];
 					abilitiesWithTimeSinceUse.remove(oldAbility);
 					AbilityData stats = LoadedData.getAbilityData(newAbility);
-					abilitiesWithTimeSinceUse.put(newAbility, stats.cooldown); 
+					abilitiesWithTimeSinceUse.put(newAbility, stats.cooldown);
 					break;
 				case ABILITY_WAS_ADDED:
-					IntMessageData d2 = (IntMessageData)message.data;
+					IntMessageData d2 = (IntMessageData) message.data;
 					AbilityType ability = AbilityType.values()[d2.value];
 					stats = LoadedData.getAbilityData(ability);
 					abilitiesWithTimeSinceUse.put(ability, stats.cooldown);
@@ -84,6 +79,9 @@ public class Hero extends StepperUnit {
 			}
 		});
 
+		setRenderableEntity(OfflineRenderableEntity.createHero(getPixelLocation(), stats.spriteSet, getDirection(),
+				(int) (health / (float) maxHealth * 100), (int) (mana / (float) maxMana * 100)));
+
 	}
 
 	@Override
@@ -91,8 +89,6 @@ public class Hero extends StepperUnit {
 		super.die(wasKilled);
 		HeroInfo.INSTANCE.notifyHeroDeath();
 	}
-
-
 
 	public boolean tryToUseItem(ItemType item) {
 		if (timeUntilItemReady <= 0) {
@@ -103,20 +99,20 @@ public class Hero extends StepperUnit {
 		}
 		return false;
 	}
-	
+
 	@Override
-	public void stun(int duration){
+	public void stun(int duration) {
 		super.stun(duration);
 		HeroInfo.INSTANCE.notifyHeroStunned(true);
 	}
-	
+
 	@Override
-	void notifyStunFaded(){
+	void notifyStunFaded() {
 		HeroInfo.INSTANCE.notifyHeroStunned(false);
 	}
 
 	private boolean canUseAbility(AbilityType ability) {
-		return hasEnoughManaForAbility(ability) && isAbilityReady(ability)&& !isStunned();
+		return hasEnoughManaForAbility(ability) && isAbilityReady(ability) && !isStunned();
 	}
 
 	private boolean hasEnoughManaForAbility(AbilityType abilityType) {
@@ -125,45 +121,44 @@ public class Hero extends StepperUnit {
 	}
 
 	private boolean isAbilityReady(AbilityType abilityType) {
-		int timeSinceUse =  getAbilityTimeSinceUse(abilityType);
+		int timeSinceUse = getAbilityTimeSinceUse(abilityType);
 		return timeSinceUse > LoadedData.getAbilityData(abilityType).cooldown;
 	}
 
-//	public int getAbilityPercentRemainingCooldown(AbilityType abilityType) {
-//		AbilityData stats = Game.getAbilityData(abilityType);
-//		int timeSinceUse =  getAbilityTimeSinceUse(abilityType);
-//		return (int) (100 * ((float) (stats.cooldown - timeSinceUse) / (float) stats.cooldown));
-//	}
+	// public int getAbilityPercentRemainingCooldown(AbilityType abilityType) {
+	// AbilityData stats = Game.getAbilityData(abilityType);
+	// int timeSinceUse = getAbilityTimeSinceUse(abilityType);
+	// return (int) (100 * ((float) (stats.cooldown - timeSinceUse) / (float)
+	// stats.cooldown));
+	// }
 
 	public void tryToUseAbility(AbilityType abilityType) {
 		if (canUseAbility(abilityType)) {
 			AbilityData stats = LoadedData.getAbilityData(abilityType);
 			performAction(stats.action);
-			if(stats.sound != null){
+			if (stats.sound != null) {
 				Sounds.play(stats.sound);
 			}
-			
-			addToMana( - stats.manaCost);
+
+			addToMana(-stats.manaCost);
 			abilitiesWithTimeSinceUse.put(abilityType, 0);
 			HeroInfo.INSTANCE.notifyHeroUsedAbility(abilityType);
 		}
 	}
-	
-	private int getAbilityTimeSinceUse(AbilityType abilityType){
-		if(abilitiesWithTimeSinceUse.containsKey(abilityType)){
+
+	private int getAbilityTimeSinceUse(AbilityType abilityType) {
+		if (abilitiesWithTimeSinceUse.containsKey(abilityType)) {
 			return abilitiesWithTimeSinceUse.get(abilityType);
 		}
 		throw new IllegalArgumentException("Hero doesn't have ability: " + abilityType);
 	}
 
-	
-
 	public void addToMana(int amount) {
 		if (mana + amount > maxMana) {
 			setMana(maxMana);
-		}else if (mana + amount < 0) {
+		} else if (mana + amount < 0) {
 			setMana(0);
-		}else{
+		} else {
 			setMana(mana + amount);
 		}
 	}
@@ -171,16 +166,17 @@ public class Hero extends StepperUnit {
 	public void gainFullMana() {
 		setMana(maxMana);
 	}
-	
-	public void setMana(int mana){
+
+	public void setMana(int mana) {
 		int oldMana = this.mana;
-		if(mana > maxMana || mana < 0){
+		if (mana > maxMana || mana < 0) {
 			throw new IllegalArgumentException();
 		}
 		this.mana = mana;
-		if(mana != oldMana){
+		if (mana != oldMana) {
 			HeroInfo.INSTANCE.notifyHeroManaChanged(oldMana, mana, false, maxMana);
 		}
+		renderableEntity.setPercentMana((int) (mana / (float)maxMana * 100));
 	}
 
 	@Override
@@ -216,7 +212,7 @@ public class Hero extends StepperUnit {
 		handleHealthRegen(delta);
 		handleItemCooldown(delta);
 		Iterator<AbilityType> abilityIterator = abilitiesWithTimeSinceUse.keySet().iterator();
-		while(abilityIterator.hasNext()){
+		while (abilityIterator.hasNext()) {
 			AbilityType a = abilityIterator.next();
 			abilitiesWithTimeSinceUse.put(a, abilitiesWithTimeSinceUse.get(a) + delta);
 		}
@@ -244,14 +240,16 @@ public class Hero extends StepperUnit {
 		}
 	}
 
-	@Override
-	protected void renderStatBars(Graphics g) {
-		Point uiTopLeft = new Point(getPixelLocation());
-		uiTopLeft.translate(0, -16);
-		RenderUtil.renderHealthBar(g, uiTopLeft,new Dimension(Map.getTileWidth(), 6), (double) health / (double) maxHealth, 2);
-		uiTopLeft.translate(0, 7);
-		RenderUtil.renderManaBar(g, uiTopLeft, new Dimension(Map.getTileWidth(), 6), (double) mana / (double) maxMana, 2);
-	}
+	// @Override
+	// protected void renderStatBars(Graphics g) {
+	// Point uiTopLeft = new Point(getPixelLocation());
+	// uiTopLeft.translate(0, -16);
+	// RenderUtil.renderHealthBar(g, uiTopLeft,new Dimension(Map.getTileWidth(),
+	// 6), (double) health / (double) maxHealth, 2);
+	// uiTopLeft.translate(0, 7);
+	// RenderUtil.renderManaBar(g, uiTopLeft, new Dimension(Map.getTileWidth(),
+	// 6), (double) mana / (double) maxMana, 2);
+	// }
 
 	@Override
 	public Team getTeam() {

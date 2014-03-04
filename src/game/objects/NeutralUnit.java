@@ -11,6 +11,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
 import rendering.HUD;
+import rendering.OfflineRenderableEntity;
 
 
 public class NeutralUnit extends SeekerUnit {
@@ -31,6 +32,7 @@ public class NeutralUnit extends SeekerUnit {
 		this.name = name;
 		this.waitTime = waitTime;
 		this.wanderLocations = wanderLocations;
+		setRenderableEntity(OfflineRenderableEntity.createNeutral(getPixelLocation(), spriteSet, getDirection(), name));
 		seekToNewLocation();
 	}
 
@@ -70,21 +72,21 @@ public class NeutralUnit extends SeekerUnit {
 		}
 	}
 
-	@Override
-	protected void renderStatBars(Graphics g) {
-		/* DO nothing */
-	}
+//	@Override
+//	protected void renderStatBars(Graphics g) {
+//		/* DO nothing */
+//	}
 
-	@Override
-	public void renderExtraVisuals(Graphics g) {
-		super.renderExtraVisuals(g);
-		g.setColor(Color.black);
-		if (HUD.NORMAL_FONT != null) {
-			g.setFont(HUD.NORMAL_FONT);
-		}
-
-		g.drawString(name, getPixelLocation().x - 17, getPixelLocation().y - 19);
-	}
+//	@Override
+//	public void renderExtraVisuals(Graphics g) {
+//		super.renderExtraVisuals(g);
+//		g.setColor(Color.black);
+//		if (HUD.NORMAL_FONT != null) {
+//			g.setFont(HUD.NORMAL_FONT);
+//		}
+//
+//		g.drawString(name, getPixelLocation().x - 17, getPixelLocation().y - 19);
+//	}
 
 	@Override
 	public Team getTeam() {

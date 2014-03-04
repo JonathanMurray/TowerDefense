@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import messages.IntArrayMessageData;
 import messages.IntArraysMessageData;
 import messages.Message;
 import messages.MessageType;
@@ -118,6 +119,14 @@ public class Server{
 			case CLIENT_PRESSED_KEYS:
 				IntArraysMessageData d1 = (IntArraysMessageData)message.data;
 				OfflinePlayerInputHandler.handleKeyboardInput(d1.array1, d1.array2, hud);
+				break;
+			case CLIENT_PRESSED_LEFT_MOUSE:
+				IntArrayMessageData d2 = (IntArrayMessageData)message.data;
+				OfflinePlayerInputHandler.handleLeftMousePressed(d2.array[0], d2.array[1], hud);
+				break;
+			case CLIENT_PRESSED_RIGHT_MOUSE:
+				IntArrayMessageData d3 = (IntArrayMessageData)message.data;
+				OfflinePlayerInputHandler.handleRightMousePressed(d3.array[0], d3.array[1], hud);
 				break;
 			case ADD_VISUAL_EFFECT:
 				break;

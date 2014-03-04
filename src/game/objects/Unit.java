@@ -29,11 +29,9 @@ public abstract class Unit extends Entity implements Mover {
 	private int timeRemainingStunned;
 	private int numberOfSlowImmunities;
 	private int numberOfStunImmunities;
-	
+
 	private boolean isCompletelyImmuneToStun = false;
 	private boolean isCompletelyImmuneToSlow = false;
-	
-
 
 	// From 0 to 1.
 	// 1 means this unit recieves full stuns, 0.25 means it will be stunned 25%
@@ -55,12 +53,11 @@ public abstract class Unit extends Entity implements Mover {
 	// is set correctly when moving
 
 	private DirectionSpriteSet spriteSet;
-	
+
 	private List<UnitMovementListener> movementListeners = new ArrayList<UnitMovementListener>();
 
-	public Unit(int maxHealth, double armor, DirectionSpriteSet spriteSet, int idleFrameIndex, int movementCooldown, Point location, 
-			SoundWrapper deathSound, double stunDurationMultiplier,
-			EntityAttributeListener... attributeListeners) {
+	public Unit(int maxHealth, double armor, DirectionSpriteSet spriteSet, int idleFrameIndex, int movementCooldown, Point location, SoundWrapper deathSound,
+			double stunDurationMultiplier, EntityAttributeListener... attributeListeners) {
 		super(maxHealth, armor, spriteSet.getSprite(Direction.DOWN), location, deathSound, attributeListeners);
 		this.spriteSet = spriteSet.getCopy();
 
@@ -75,39 +72,40 @@ public abstract class Unit extends Entity implements Mover {
 		previousY = location.y;
 		updatePixelLocation();
 	}
-	
-	public void setCompletelyImmuneToStun(){
+
+	public void setCompletelyImmuneToStun() {
 		isCompletelyImmuneToStun = true;
 	}
-	
+
 	/**
-	 * WARNING.
-	 * Actually REMOVES the speed multipliers, so if you later change back to "not immune" these effects are not magically reapplied.
+	 * WARNING. Actually REMOVES the speed multipliers, so if you later change
+	 * back to "not immune" these effects are not magically reapplied.
+	 * 
 	 * @param completelyImmune
 	 */
-	public void setCompletelyImmuneToSlow(){
+	public void setCompletelyImmuneToSlow() {
 		isCompletelyImmuneToSlow = true;
 		HashMap<String, Double> speedMultipliers = super.attributeMultipliers.get(EntityAttribute.MOVEMENT_SPEED);
-		Iterator<Entry<String,Double>> speedMultipliersIt =speedMultipliers.entrySet().iterator();
-		while(speedMultipliersIt.hasNext()){
-			if(speedMultipliersIt.next().getValue() < 1){
+		Iterator<Entry<String, Double>> speedMultipliersIt = speedMultipliers.entrySet().iterator();
+		while (speedMultipliersIt.hasNext()) {
+			if (speedMultipliersIt.next().getValue() < 1) {
 				speedMultipliersIt.remove();
 			}
 		}
 	}
-	
+
 	@Override
-	public void addAttributeMultiplier(EntityAttribute attribute, String multiplierID, double multiplier) throws OperationNotSupportedException{
-		if(isCompletelyImmuneToSlow && attribute == EntityAttribute.MOVEMENT_SPEED){
-			if(multiplier < 1){
+	public void addAttributeMultiplier(EntityAttribute attribute, String multiplierID, double multiplier) throws OperationNotSupportedException {
+		if (isCompletelyImmuneToSlow && attribute == EntityAttribute.MOVEMENT_SPEED) {
+			if (multiplier < 1) {
 				return;
 			}
 		}
 		super.addAttributeMultiplier(attribute, multiplierID, multiplier);
 	}
-	
-	public void addMovementListener(UnitMovementListener listener){
-		movementListeners.add(listener); 
+
+	public void addMovementListener(UnitMovementListener listener) {
+		movementListeners.add(listener);
 	}
 
 	public boolean isMidMovement() {
@@ -133,13 +131,17 @@ public abstract class Unit extends Entity implements Mover {
 		y = newY;
 		Map.instance().setLocationBlockedByEntity(previousX, previousY, false);
 		Map.instance().setLocationBlockedByEntity(x, y, true);
-		
-		for(UnitMovementListener movementListener : movementListeners){
+
+		for (UnitMovementListener movementListener : movementListeners) {
 			movementListener.newLocation(x, y);
 		}
+		Direction dir = Direction.getDirection(x - previousX, y - previousY);
+		renderableEntity.setLocationAndSpeed(getPixelLocation(), new Point((int) (dir.dx * Map.getTileWidth() / (float) movementCooldown * 1000f), (int) (dir.dy * Map.getTileHeight()
+				/ (float) movementCooldown * 1000f)));
 	}
 
 	protected final void stayAtSameLocation() {
+		notifyRenderableEntityNoMovement();
 		previousX = x;
 		previousY = y;
 	}
@@ -156,6 +158,7 @@ public abstract class Unit extends Entity implements Mover {
 
 	public void setDirection(Direction newDirection) {
 		direction = newDirection;
+		renderableEntity.setDirection(newDirection);
 	}
 
 	public Direction getDirection() {
@@ -182,7 +185,6 @@ public abstract class Unit extends Entity implements Mover {
 	 * public void removeSpeedMultiplier(String multiplierID){
 	 * speedMultipliers.remove(multiplierID); updateMovementCooldown(); }
 	 */
-	
 
 	@Override
 	protected void multiplyAttribute(EntityAttribute attribute, double totalMultiplier) throws OperationNotSupportedException {
@@ -341,9 +343,11 @@ public abstract class Unit extends Entity implements Mover {
 		// The animation would be reset every tile = choppy graphics
 		if (timeSinceLastMove >= movementCooldown + 10) {
 			currentSprite.setAutoUpdate(false);
+			renderableEntity.setAutoUpdateSprite(false);
 			currentSprite.setCurrentFrame(idleFrameIndex);
 		} else {
 			currentSprite.setAutoUpdate(true);
+			renderableEntity.setAutoUpdateSprite(true);
 		}
 
 	}
@@ -377,7 +381,12 @@ public abstract class Unit extends Entity implements Mover {
 		} else {
 			isMidMovement = false;
 			timeUntilAlignedToTile = 0;
+			notifyRenderableEntityNoMovement();
 		}
+	}
+	
+	private void notifyRenderableEntityNoMovement(){
+		renderableEntity.setLocationAndSpeed(getPixelLocation(), new Point(0,0));
 	}
 
 	private void updatePixelLocation() {

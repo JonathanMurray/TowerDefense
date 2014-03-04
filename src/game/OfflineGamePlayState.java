@@ -105,6 +105,8 @@ public class OfflineGamePlayState extends GamePlayState{
 		objectsToBeAdded = new ArrayList<VisibleObject>();
 		setupMerchant();
 		merchant.addMovementListener(HeroInfo.INSTANCE);
+		
+		GamePlayStateInstance.INSTANCE = this;
 
 		System.out.println("\n\n");
 		System.out.println("gamneplay enter done at " + System.currentTimeMillis());
@@ -283,17 +285,17 @@ public class OfflineGamePlayState extends GamePlayState{
 	// visibleObjects.add(item);
 	// }
 
-	public void addTower(Tower tower) {
+	public void addTower(Tower tower, TowerType towerType) {
 		visibleObjects.add(tower);
 		Player.INSTANCE.notifyTowerWasAdded(tower);
 		tower.notifyBirth();
 	}
 
-	public void addSuperTower(SuperTower superTower) {
-		visibleObjects.add(superTower);
-		Player.INSTANCE.notifySuperTowerWasAdded(superTower);
-		superTower.notifyBirth();
-	}
+//	public void addSuperTower(SuperTower superTower) {
+//		visibleObjects.add(superTower);
+//		Player.INSTANCE.notifySuperTowerWasAdded(superTower);
+//		superTower.notifyBirth();
+//	}
 
 	public void addEnemy(Enemy enemy) {
 		objectsToBeAdded.add(enemy);

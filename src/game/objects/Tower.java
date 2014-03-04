@@ -6,9 +6,13 @@ import game.Map;
 import game.RangedAttack;
 import game.TechUpgrade;
 
+import java.awt.List;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import org.newdawn.slick.Animation;
+
+import rendering.OfflineRenderableEntity;
 import applicationSpecific.TowerType;
 
 public class Tower extends Entity {
@@ -38,6 +42,7 @@ public class Tower extends Entity {
 		if(attack != null){
 			attackPixelRange = (int)(attack.getRange()*Map.getTileWidth()); 
 		}
+		setRenderableEntity(OfflineRenderableEntity.createTower(getPixelLocation(), stats.sprite, 100));
 	}
 	
 	public int getMaxHealth(){

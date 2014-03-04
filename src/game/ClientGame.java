@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import messages.IntArrayMessageData;
 import messages.IntArraysMessageData;
 import messages.Message;
 import messages.MessageType;
@@ -161,7 +162,12 @@ public class ClientGame extends BasicGame implements  MessageListener {
 	
 	
 	private void handleMouseInput(Input input, int delta, HUD hud){
-		
+		if(input.isMousePressed(0)){
+			client.sendMessageToServer(new Message(MessageType.CLIENT_PRESSED_LEFT_MOUSE, new IntArrayMessageData(input.getMouseX(), input.getMouseY())));
+		}
+		if(input.isMousePressed(1)){
+			client.sendMessageToServer(new Message(MessageType.CLIENT_PRESSED_RIGHT_MOUSE, new IntArrayMessageData(input.getMouseX(), input.getMouseY())));
+		}
 	}
 
 	private static HUD hud;

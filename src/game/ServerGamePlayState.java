@@ -16,8 +16,10 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import messages.IntArrayMessageData;
 import messages.Message;
 import messages.MessageType;
+import multiplayer.AddVisualEffectData;
 import multiplayer.Server;
 
 import org.newdawn.slick.GameContainer;
@@ -97,6 +99,8 @@ public class ServerGamePlayState extends GamePlayState implements MessageListene
 		objectsToBeAdded = new ArrayList<VisibleObject>();
 		setupMerchant();
 		merchant.addMovementListener(HeroInfo.INSTANCE);
+		
+		GamePlayStateInstance.INSTANCE = this;
 
 		System.out.println("\n\n");
 		System.out.println("gameplaystate init done at " + System.currentTimeMillis());
@@ -135,20 +139,23 @@ public class ServerGamePlayState extends GamePlayState implements MessageListene
 		visibleObjects.add(hero);
 	}
 
-	public void addTower(Tower tower) {
+	public void addTower(Tower tower, TowerType towerType) {
 		visibleObjects.add(tower);
 		Player.INSTANCE.notifyTowerWasAdded(tower);
+		server.sendMessageToClients(new Message(MessageType.TOWER_WAS_ADDED, new IntArrayMessageData(towerType.ordinal(), tower.getLocation().x, tower.getLocation().y)));
 		tower.notifyBirth();
 	}
 
-	public static void addSuperTower(SuperTower superTower) {
-		visibleObjects.add(superTower);
-		Player.INSTANCE.notifySuperTowerWasAdded(superTower);
-		superTower.notifyBirth();
-	}
+//	public static void addSuperTower(SuperTower superTower) {
+//		visibleObjects.add(superTower);
+//		Player.INSTANCE.notifySuperTowerWasAdded(superTower);
+//		superTower.notifyBirth();
+//	}
 
 	public void addEnemy(Enemy enemy) {
 		objectsToBeAdded.add(enemy);
+//		AddVisualEffectData messageData = new AddVisualEffectData(id, pixelX, pixelY, horPixelsPerSec, verPixelsPerSec, animationId)
+//		server.sendMessageToClients(new Message(MessageType.ADD_VISUAL_EFFECT, new AddVisualEffectData(id, pixelX, pixelY, horPixelsPerSec, verPixelsPerSec, animationId)))
 	}
 
 	public void addProjectile(Projectile projectile) {

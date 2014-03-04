@@ -5,9 +5,10 @@ import game.objects.Projectile;
 import game.objects.Tower;
 import game.objects.VisualEffect;
 import game.objects.enemies.Enemy;
-import messages.Message;
 
 import org.newdawn.slick.state.BasicGameState;
+
+import applicationSpecific.TowerType;
 
 public abstract class GamePlayState extends BasicGameState{
 	abstract void setWaves(Waves waves);
@@ -22,7 +23,7 @@ public abstract class GamePlayState extends BasicGameState{
 
 	public abstract void addSpecialEffect(VisualEffect animationBasedVisualEffect);
 
-	public abstract void addTower(Tower tower);
+	public abstract void addTower(Tower tower, TowerType towerType);
 
 	public abstract void addProjectile(Projectile p);
 

@@ -61,13 +61,19 @@ public class OfflinePlayerInputHandler implements MessageListener {
 	public static void handleMouseInput(Input input, int delta, HUD hud) {
 		int mouseX = input.getMouseX();
 		int mouseY = input.getMouseY();
-
 		if (input.isMousePressed(0)) { 
-			Player.INSTANCE.tryToBuildTowerAtLocation(selectedTower, Map.getTileLocationFromMouseLocation(new Point(mouseX, mouseY)));
+			handleLeftMousePressed(mouseX, mouseY, hud);
 		} else if (input.isMousePressed(1)) {
-			Player.INSTANCE.tryToSellTowerAtLocation(Map.getTileXFromMouseX(mouseX), Map.getTileYFromMouseY(mouseY));
+			handleRightMousePressed(mouseX, mouseY, hud);
 		}
-
+	}
+	
+	public static void handleLeftMousePressed(int mouseX, int mouseY, HUD hud){
+		Player.INSTANCE.tryToBuildTowerAtLocation(selectedTower, Map.getTileLocationFromMouseLocation(new Point(mouseX, mouseY)));
+	}
+	
+	public static void handleRightMousePressed(int mouseX, int mouseY, HUD hud){
+		Player.INSTANCE.tryToSellTowerAtLocation(Map.getTileXFromMouseX(mouseX), Map.getTileYFromMouseY(mouseY));
 	}
 
 	

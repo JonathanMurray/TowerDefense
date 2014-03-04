@@ -90,11 +90,7 @@ public class Player implements MessageListener{
 		}
 		return towersWithinRange;
 	}
-
-	/*
-	 * public boolean affordsTower(TowerType towerType) { return money >=
-	 * towerType.buildCost; }
-	 */
+	
 	public boolean affordsItem(ItemType potionType) {
 		return money >= LoadedData.getItemData(potionType).buyCost;
 	}
@@ -105,29 +101,32 @@ public class Player implements MessageListener{
 		if (money >= buildCost && !Map.blockedForTowers(location.x, location.y)) {
 			buildTower(location, tower);
 			loseMoney(buildCost);
+			System.out.println("Player. successful build tower " + tower + " at " + location);//TODO
+		}else{
+			System.out.println("Player. failed build tower " + tower + " at " + location);//TODO
 		}
 	}
 
-	public boolean canBuildSuperTower() {
-		return money >= SUPER_TOWER_BUILD_COST;
-	}
+//	public boolean canBuildSuperTower() {
+//		return money >= SUPER_TOWER_BUILD_COST;
+//	}
 
-	public void tryToBuildSuperTowerAtLocation(SuperTowerType type, Point location) {
-		if (!hasSuperTower()) {
-			boolean validSuperTowerLocation = !Map.blockedForHero(location.x, location.y) && !Map.blockedForTowers(location.x, location.y);
+//	public void tryToBuildSuperTowerAtLocation(SuperTowerType type, Point location) {
+//		if (!hasSuperTower()) {
+//			boolean validSuperTowerLocation = !Map.blockedForHero(location.x, location.y) && !Map.blockedForTowers(location.x, location.y);
+//
+//			if (money >= SUPER_TOWER_BUILD_COST && validSuperTowerLocation) {
+//				buildSuperTower(location, type);
+//				loseMoney(SUPER_TOWER_BUILD_COST);
+//			}
+//		}
+//	}
 
-			if (money >= SUPER_TOWER_BUILD_COST && validSuperTowerLocation) {
-				buildSuperTower(location, type);
-				loseMoney(SUPER_TOWER_BUILD_COST);
-			}
-		}
-	}
-
-	private void buildSuperTower(Point location, SuperTowerType type) {
-		SuperTower superTower = new SuperTower(type, location, upgrades);
-		//GamePlayStateInstance.INSTANCE.addSuperTower(superTower);
-		throw new IllegalStateException("Not yet implemented");
-	}
+//	private void buildSuperTower(Point location, SuperTowerType type) {
+//		SuperTower superTower = new SuperTower(type, location, upgrades);
+//		//GamePlayStateInstance.INSTANCE.addSuperTower(superTower);
+//		throw new IllegalStateException("Not yet implemented");
+//	}
 
 	boolean hasSuperTower() {
 		return superTower != null;
@@ -142,7 +141,8 @@ public class Player implements MessageListener{
 
 	private void buildTower(Point location, TowerType type) {
 		Tower tower = Tower.createTower(type, location, upgrades);
-		GamePlayStateInstance.INSTANCE.addTower(tower);
+		GamePlayStateInstance.INSTANCE.addTower(tower, type);
+		
 	}
 
 	void notifyTowerWasAdded(Tower tower) {
