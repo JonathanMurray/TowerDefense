@@ -1,8 +1,8 @@
 package game.actions.targetPickers;
 
-import game.Entities;
+import game.EntityHandler;
 import game.GamePlayStateInstance;
-import game.Physics;
+import game.PhysicsHandler;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
@@ -38,14 +38,14 @@ public class TargetLineAhead implements TargetPicker {
 		Unit actorUnit = (Unit)actor;
 		Point source = getSource(actorUnit, distance);
 		List<Entity> targets = new ArrayList<Entity>();
-		Entity hitTarget = getTargetOnLocation(Physics.getRelativeLocation(
+		Entity hitTarget = getTargetOnLocation(PhysicsHandler.getRelativeLocation(
 				actorUnit.getLocation(),
 				actorUnit.getDirection().getVector(1, 0)), renderAnimations);
 		if(hitTarget != null){
 			targets.add(hitTarget);
 		}
 		for (int i = 1; i < distance; i++) {
-			Point targetLocation = Physics.getRelativeLocation(
+			Point targetLocation = PhysicsHandler.getRelativeLocation(
 					source, actorUnit.getDirection(), i);
 			hitTarget = getTargetOnLocation(targetLocation, renderAnimations);
 			if(hitTarget != null){
@@ -58,20 +58,20 @@ public class TargetLineAhead implements TargetPicker {
 	
 
 	private Point getSource(Unit actor, int distance) {
-		Point left = Physics.getRelativeLocation(
+		Point left = PhysicsHandler.getRelativeLocation(
 				actor.getLocation(),
 				actor.getDirection().getVector(1, -1));
-		Point mid = Physics.getRelativeLocation(actor.getLocation(),
+		Point mid = PhysicsHandler.getRelativeLocation(actor.getLocation(),
 				actor.getDirection().getVector(1, 0));
-		Point right = Physics.getRelativeLocation(
+		Point right = PhysicsHandler.getRelativeLocation(
 				actor.getLocation(),
 				actor.getDirection().getVector(1, 1));
-		if (Entities.getEntitiesOnLine(mid, actor.getDirection(),
+		if (EntityHandler.getEntitiesOnLine(mid, actor.getDirection(),
 				distance, targetTeam).size() == 0) {
-			if (Entities.getEntitiesOnLine(left,
+			if (EntityHandler.getEntitiesOnLine(left,
 					actor.getDirection(), distance, targetTeam).size() > 0) {
 				return left;
-			} else if (Entities.getEntitiesOnLine(right,
+			} else if (EntityHandler.getEntitiesOnLine(right,
 					actor.getDirection(), distance, targetTeam).size() > 0) {
 				return right;
 			}
@@ -83,9 +83,9 @@ public class TargetLineAhead implements TargetPicker {
 	private Entity getTargetOnLocation(Point location, boolean renderAnimations) {
 		try {
 			if(renderAnimations && animation != null){
-				GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(Physics.getPixelCenterLocation(location),animation));
+				GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(PhysicsHandler.getPixelCenterLocation(location),animation));
 			}
-			return Entities.getEntityOnLocation(location, targetTeam);
+			return EntityHandler.getEntityOnLocation(location, targetTeam);
 		} catch (EntityNotFound e) {
 			return null;
 		}

@@ -1,26 +1,8 @@
 package game;
 
-import game.objects.HeroData;
-import game.objects.TowerData;
-import game.objects.enemies.EnemyData;
-
-import java.nio.file.Path;
-import java.util.HashMap;
-
-
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
-
-import xmlLoading.XML_Loader;
-
-import applicationSpecific.AbilityType;
-import applicationSpecific.EnemyType;
-import applicationSpecific.HeroType;
-import applicationSpecific.ItemType;
-import applicationSpecific.Paths;
-import applicationSpecific.TowerType;
 
 public class OfflineGame extends StateBasedGame implements Game{
 

@@ -1,10 +1,6 @@
 package rendering;
 
-import game.HeroInfoListener;
 import game.LoadedData;
-import game.MessageListener;
-import game.OfflineGame;
-import game.PlayerListener;
 import game.ResourceLoader;
 import game.objects.Entity;
 import game.objects.EntityAttribute;
@@ -20,10 +16,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import messages.HUDMessage;
 import messages.IntArrayMessageData;
 import messages.IntMessageData;
 import messages.Message;
+import messages.MessageListener;
 import messages.MessageType;
+import messages.UserInputMessage;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -129,8 +128,7 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 	public void addInputListener(MessageListener listener) {
 		listeners.add(listener);
 		if(buyTowerButtons.hasAddedSomeTowerButton){
-			TowerType selectedTower = buyTowerButtons.getTowerOfButtonWithIndex(selectedTowerIndex) ;
-			listener.messageReceived(new Message(MessageType.TOWER_WAS_SELECTED, new IntMessageData(selectedTower.ordinal())));
+			listener.messageReceived(new Message(UserInputMessage.PRESSED_SELECT_TOWER, new IntMessageData(selectedTowerIndex)));
 		}
 	}
 
@@ -209,7 +207,7 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 			public void choiceWasMade(int choiceIndex) {
 				AbilityType oldAbility = abilities.get(choiceIndex);
 				for(MessageListener listener : listeners){
-					listener.messageReceived(new Message(MessageType.PRESSED_REPLACE_ABILITY, new IntArrayMessageData(oldAbility.ordinal(), abilityToReplaceOld.ordinal())));
+					listener.messageReceived(new Message(UserInputMessage.PRESSED_REPLACE_ABILITY, new IntArrayMessageData(oldAbility.ordinal(), abilityToReplaceOld.ordinal())));
 				}
 				isChoosingAbility = false;
 			}
@@ -230,7 +228,7 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 		for (int i = 0; i < newAbilities.length; i++) {
 			choices[i] = new DialogChoice(LoadedData.getAbilityData(newAbilities[i]));
 		}
-		choices[newAbilities.length] = new DialogChoice(ResourceLoader.createBlankImage(1, 1), "None", "Keep your existing\nabilities");
+		choices[newAbilities.length] = new DialogChoice(ResourceLoader.createBlankImage(10, 10), "None", "Keep your existing\nabilities");
 		Dialog dialog = KeyboardDialog.createDialog(this, container, "Pick new ability:", new Point(DIALOG_LOCATION_X, DIALOG_LOCATION_Y), choices);
 		dialogs.add(dialog);
 		dialog.setListener(new DialogListener() {
@@ -265,16 +263,15 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 		if (sourceRow == buyTowerButtons) {
 			if(((TowerButton)sourceButton).isActive){
 				selectedTowerIndex = buttonIndex;
-				TowerType tower = buyTowerButtons.getTowerOfButtonWithIndex(selectedTowerIndex);
 				for(MessageListener listener : listeners){
-					listener.messageReceived(new Message(MessageType.TOWER_WAS_SELECTED, new IntMessageData(tower.ordinal())));
+					listener.messageReceived(new Message(UserInputMessage.PRESSED_SELECT_TOWER, new IntMessageData(selectedTowerIndex)));
 				}
 			}
 			
 		} else if (sourceRow == vendorButtons) {
 			ItemType item = vendorButtons.getItemOfButtonWithIndex(buttonIndex);
 			for(MessageListener listener : listeners){
-				listener.messageReceived(new Message(MessageType.PRESSED_BUY_ITEM, new IntMessageData(item.ordinal())));
+				listener.messageReceived(new Message(UserInputMessage.PRESSED_BUY_ITEM, new IntMessageData(item.ordinal())));
 			}
 		}
 	}
@@ -286,7 +283,7 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 		}
 		TowerType tower = ((TowerButton)sourceButton).getTowerType();
 		for(MessageListener listener : listeners){
-			listener.messageReceived(new Message(MessageType.PRESSED_UNLOCK_TOWER, new IntMessageData(tower.ordinal())));
+			listener.messageReceived(new Message(UserInputMessage.PRESSED_UNLOCK_TOWER, new IntMessageData(tower.ordinal())));
 		}
 	}
 
@@ -314,12 +311,20 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 		Rectangle tooltipRect = new Rectangle((int) buttonTopLeft.getX(), (int) buttonTopLeft.getY() - height - space, width, height);
 		return new TextBox(tooltipRect, text);
 	}
+	
+	public boolean hasAbilityWithNumber(int abilityNumber){
+		return abilityNumber >= 1 && abilityNumber <= abilities.size();
+	}
 
 	public AbilityType getAbilityWithNumber(int abilityNumber) {
 		if (abilityNumber < 1 || abilityNumber > abilities.size()) {
 			throw new IllegalArgumentException("No ability with that number");
 		}
 		return abilities.get(abilityNumber - 1);
+	}
+	
+	public boolean hasItemWithNumber(int itemNumber){
+		return itemButtons.hasItemWithNumber(itemNumber);
 	}
 
 	public ItemType getItemWithNumber(int itemNumber) {
@@ -333,7 +338,7 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 	@Override
 	public void messageReceived(Message message) {
 		System.out.println("hud received msg:  " + message);
-		switch(message.type){
+		switch((HUDMessage)message.type){
 		case HERO_IN_RANGE_OF_VENDOR:
 			vendorButtons.heroIsNowInRangeOfVendor(message.getBoolDataValue());
 			break;
@@ -377,6 +382,8 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 			break;
 			
 		case NUM_STATPOINTS_CHANGED:
+			System.out.println("hud.numStatpoitnschanged");//TODO
+			
 			int numAvailableStatpoints = message.getIntDataValue();
 			this.numAvailableStatpoints = numAvailableStatpoints;
 			for(Button b : statButtons.buttons){
@@ -385,6 +392,7 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 			break;
 			
 		case ITEM_WAS_USED:
+			System.out.println("HUD.itemwasused");//TODO
 			int timeUntilCanUseAgain = message.getNthDataValue(1);
 			timeUntilCanUseItemAgain = timeUntilCanUseAgain;
 			itemButtons.itemWasUsed(timeUntilCanUseAgain);
@@ -415,7 +423,8 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 			abilityButtons.addAbilityButton(newAbility, keyChars.abilities);
 			break;
 		
-		case TOWER_WAS_ADDED:
+		case TOWER_WAS_MADE_AVAILABLE:
+			//(MessageType.TOWER_WAS_ADDED, new IntArrayMessageData(towerType.ordinal(), tower.getLocation().x, tower.getLocation().y)));
 			buyTowerButtons.addTowerButton(TowerType.values()[message.getIntDataValue()]);
 			break;
 			
@@ -443,6 +452,16 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 			
 		case ITEM_WAS_DROPPED:
 			itemButtons.itemWasDropped(message.getIntDataValue());
+		case TOWER_WAS_SELECTED:
+			break;
+		case ABILITY_WAS_PRESSED:
+			break;
+		case ITEM_WAS_PRESSED:
+			break;
+		default:
+			break;
+
+
 		}
 	}
 
@@ -620,7 +639,7 @@ public class HUD implements  ButtonRowListener, EntityAttributeListener, Message
 				addAbilitySwapDialog(upcomingAbility);
 			}else{
 				for(MessageListener listener : listeners){
-					listener.messageReceived(new Message(MessageType.PRESSED_ADD_ABILITY, new IntMessageData(upcomingAbility.ordinal())));
+					listener.messageReceived(new Message(UserInputMessage.PRESSED_ADD_ABILITY, new IntMessageData(upcomingAbility.ordinal())));
 				}
 				
 			}

@@ -8,20 +8,19 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import messages.HUDMessage;
 import messages.IntMessageData;
 import messages.Message;
+import messages.MessageListener;
 import messages.MessageType;
 
 import org.newdawn.slick.Input;
 
 import rendering.HUD;
-import rendering.HUD_InputListener;
-import applicationSpecific.AbilityType;
 import applicationSpecific.ItemType;
-import applicationSpecific.SuperTowerType;
 import applicationSpecific.TowerType;
 
-public class Player implements MessageListener{
+public class Player{
 	private int money;
 
 	private ArrayList<Tower> towers = new ArrayList<Tower>();
@@ -67,7 +66,7 @@ public class Player implements MessageListener{
 	private void setMoney(int amount){
 		money = amount;
 		for(MessageListener listener : listeners){
-			listener.messageReceived(new Message(MessageType.MONEY_WAS_UPDATED, new IntMessageData(money)));
+			listener.messageReceived(new Message(HUDMessage.MONEY_WAS_UPDATED, new IntMessageData(money)));
 		}
 	}
 
@@ -212,7 +211,7 @@ public class Player implements MessageListener{
 	}
 
 	public void loseLife(int amount) {
-		Sounds.play(LOSE_LIFE_SOUND);
+		SoundHandler.play(LOSE_LIFE_SOUND);
 		setLife(life - amount);
 		if (life <= 0) {
 			OfflineGame.loseGame();
@@ -222,7 +221,7 @@ public class Player implements MessageListener{
 	private void setLife(int amount){
 		life = amount;
 		for(MessageListener listener : listeners){
-			listener.messageReceived(new Message(MessageType.PLAYER_LIFE_WAS_UPDATED, new IntMessageData(life)));
+			listener.messageReceived(new Message(HUDMessage.PLAYER_LIFE_WAS_UPDATED, new IntMessageData(life)));
 		}
 	}
 
@@ -233,7 +232,7 @@ public class Player implements MessageListener{
 	public void addAvailableTower(TowerType towerType) {
 		availableTowers.add(towerType);
 		for(MessageListener listener : listeners){
-			listener.messageReceived(new Message(MessageType.TOWER_WAS_ADDED, new IntMessageData(towerType.ordinal())));
+			listener.messageReceived(new Message(HUDMessage.TOWER_WAS_MADE_AVAILABLE, new IntMessageData(towerType.ordinal())));
 		}
 	}
 
@@ -254,7 +253,7 @@ public class Player implements MessageListener{
 		}
 		unlockedTowers.add(towerType);
 		for(MessageListener listener : listeners){
-			listener.messageReceived(new Message(MessageType.TOWER_WAS_UNLOCKED, new IntMessageData(towerType.ordinal())));
+			listener.messageReceived(new Message(HUDMessage.TOWER_WAS_UNLOCKED, new IntMessageData(towerType.ordinal())));
 		}
 	}
 	
@@ -271,9 +270,9 @@ public class Player implements MessageListener{
 		}
 		for(MessageListener listener : listeners){
 			if(removedItem != null){
-				listener.messageReceived(new Message(MessageType.ITEM_WAS_REMOVED, new IntMessageData(removedItem.ordinal())));
+				listener.messageReceived(new Message(HUDMessage.ITEM_WAS_REMOVED, new IntMessageData(removedItem.ordinal())));
 			}
-			listener.messageReceived(new Message(MessageType.ITEM_WAS_ADDED, new IntMessageData(itemType.ordinal())));
+			listener.messageReceived(new Message(HUDMessage.ITEM_WAS_ADDED, new IntMessageData(itemType.ordinal())));
 		}
 		
 		
@@ -282,29 +281,22 @@ public class Player implements MessageListener{
 	public void removeAvailableItem(ItemType itemType) {
 		availableItems.remove(itemType);
 		for(MessageListener listener : listeners){
-			listener.messageReceived(new Message(MessageType.ITEM_WAS_REMOVED, new IntMessageData(itemType.ordinal())));
+			listener.messageReceived(new Message(HUDMessage.ITEM_WAS_REMOVED, new IntMessageData(itemType.ordinal())));
 		}
 	}
 
-
-	@Override
-	public void messageReceived(Message message) {
-		switch(message.type){
-		case PRESSED_BUY_ITEM:
-			ItemType itemType = ItemType.values()[message.getIntDataValue()];
-			ItemData itemStats = LoadedData.getItemData(itemType);
-			if (HeroInfo.INSTANCE.isHeroAlive()) {
-				if (money >= itemStats.buyCost && HeroInfo.INSTANCE.hasSpaceForItem(itemType) && gameplayState.isHeroAliveAndCloseEnoughToMerchant()) {
-					HeroInfo.INSTANCE.equipItem(itemType);
-					loseMoney(itemStats.buyCost);
-					if (itemStats.isUnique) {
-						removeAvailableItem(itemType);
-					}
+	public void pressedBuyItem(ItemType itemType){
+		ItemData itemStats = LoadedData.getItemData(itemType);
+		if (HeroInfo.INSTANCE.isHeroAlive()) {
+			if (money >= itemStats.buyCost && HeroInfo.INSTANCE.hasSpaceForItem(itemType) && gameplayState.isHeroAliveAndCloseEnoughToMerchant()) {
+				HeroInfo.INSTANCE.equipItem(itemType);
+				loseMoney(itemStats.buyCost);
+				if (itemStats.isUnique) {
+					removeAvailableItem(itemType);
 				}
 			}
-			break;
-			
 		}
 	}
+
 
 }

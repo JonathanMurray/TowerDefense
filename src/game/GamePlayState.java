@@ -11,7 +11,7 @@ import org.newdawn.slick.state.BasicGameState;
 import applicationSpecific.TowerType;
 
 public abstract class GamePlayState extends BasicGameState{
-	abstract void setWaves(Waves waves);
+	abstract void setWaves(WaveHandler waves);
 
 	abstract public void offerHeroOneOfAbilities(AbilityPair abilityPair);
 

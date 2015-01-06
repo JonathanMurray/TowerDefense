@@ -1,6 +1,6 @@
 package game.objects.enemies;
 
-import game.Physics;
+import game.PhysicsHandler;
 import game.objects.HeroInfo;
 
 import java.awt.Point;
@@ -65,7 +65,7 @@ class StateToHero extends State {
 	private void handlePositionChange() {
 		Point heroLocation = HeroInfo.INSTANCE.getHero().getLocation();
 		if (enemy.getTimeSinceLastMove() > changePositionCooldown
-				&& Physics.arePointsAdjacent(heroLocation, enemy.getLocation())) {
+				&& PhysicsHandler.arePointsAdjacent(heroLocation, enemy.getLocation())) {
 			if (random.nextInt(2) == 1) {
 				enemy.seek1StepToOtherAdjacentLocation(heroLocation);
 			}

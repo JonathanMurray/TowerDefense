@@ -1,6 +1,6 @@
 package game.actions.targetPickers;
 
-import game.Entities;
+import game.EntityHandler;
 import game.GamePlayStateInstance;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
@@ -26,7 +26,7 @@ public class TargetAdjacentEntities implements TargetPicker{
 		if(renderAnimation && animation != null){
 			GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(actor, animation));
 		}
-		return Entities.getEntitiesAdjacentTo(actor.getLocation(), targetTeam).toArray(new Entity[0]);
+		return EntityHandler.getEntitiesAdjacentTo(actor.getLocation(), targetTeam).toArray(new Entity[0]);
 	}
 	
 	

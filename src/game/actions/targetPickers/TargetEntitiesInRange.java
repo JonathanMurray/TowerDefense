@@ -1,6 +1,6 @@
 package game.actions.targetPickers;
 
-import game.Entities;
+import game.EntityHandler;
 import game.GamePlayStateInstance;
 import game.actions.ParameterName;
 import game.actions.Parameters;
@@ -29,7 +29,7 @@ public class TargetEntitiesInRange implements TargetPicker {
 	@Override
 	public Entity[] pickTargets(Entity actor, boolean renderAnimations, Parameters parameters) {
 		double range = parameters.getDouble(ParameterName.RANGE, this.range);
-		ArrayList<Entity> closeTargets = Entities.getEntitiesWithinRange(actor.getLocation(), range, targetTeam);
+		ArrayList<Entity> closeTargets = EntityHandler.getEntitiesWithinRange(actor.getLocation(), range, targetTeam);
 		if(!includeActor){
 			closeTargets.remove(actor);
 		}

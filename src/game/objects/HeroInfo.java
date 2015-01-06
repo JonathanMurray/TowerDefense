@@ -3,9 +3,8 @@ package game.objects;
 import game.EntityHealthListener;
 import game.GamePlayState;
 import game.LoadedData;
-import game.MessageListener;
 import game.ResourceLoader;
-import game.Sounds;
+import game.SoundHandler;
 import game.UnitMovementListener;
 import game.objects.HeroData.AbilityPair;
 
@@ -17,21 +16,22 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import messages.BoolMessageData;
+import messages.HUDMessage;
 import messages.IntArrayMessageData;
 import messages.IntMessageData;
 import messages.Message;
+import messages.MessageListener;
 import messages.MessageType;
+import messages.UserInputMessage;
 
 import org.newdawn.slick.Graphics;
 
 import rendering.HUD;
-import rendering.HUD_InputListener;
 import applicationSpecific.AbilityType;
 import applicationSpecific.HeroType;
 import applicationSpecific.ItemType;
-import applicationSpecific.TowerType;
 
-public class HeroInfo implements MessageListener, EntityHealthListener, UnitMovementListener {
+public class HeroInfo implements EntityHealthListener, UnitMovementListener {
 
 	public final static int MAX_ABILITIES = 5;
 	public final static int MAX_USABLE_ITEMS = 5;
@@ -90,7 +90,7 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 				hero.gainFullMana();
 				hero.notifyBirth();
 				for (MessageListener listener : listeners) {
-					listener.messageReceived(new Message(MessageType.HERO_REVIVED));
+					listener.messageReceived(new Message(HUDMessage.HERO_REVIVED));
 				}
 			}
 		}
@@ -116,7 +116,7 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 	void notifyHeroDeath() {
 		timeUntilResurrection = HERO_RESURRECTION_CD;
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.HERO_DIED, new IntMessageData(timeUntilResurrection)));
+			listener.messageReceived(new Message(HUDMessage.HERO_DIED, new IntMessageData(timeUntilResurrection)));
 		}
 	}
 
@@ -162,7 +162,7 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 
 		LoadedData.getItemData(newItem).wasEquipped(hero);
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.ITEM_WAS_EQUIPPED, new IntMessageData(newItem.ordinal())));
+			listener.messageReceived(new Message(HUDMessage.ITEM_WAS_EQUIPPED, new IntMessageData(newItem.ordinal())));
 		}
 		if (equippedItems.size() > MAX_USABLE_ITEMS) {
 			throw new IllegalStateException("Too many abilities");
@@ -183,7 +183,7 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 		LoadedData.getItemData(itemType).wasDropped(hero);
 		for (MessageListener listener : listeners) {
 			// listener.itemWasDropped(itemIndex);
-			listener.messageReceived(new Message(MessageType.ITEM_WAS_USED, new IntArrayMessageData(itemType.ordinal(), timeUntilResurrection)));
+			listener.messageReceived(new Message(HUDMessage.ITEM_WAS_DROPPED, new IntMessageData(itemIndex)));
 		}
 	}
 
@@ -215,7 +215,7 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 		}
 		abilities.add(newAbility);
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.ABILITY_WAS_ADDED, new IntMessageData(newAbility.ordinal())));
+			listener.messageReceived(new Message(HUDMessage.ABILITY_WAS_ADDED, new IntMessageData(newAbility.ordinal())));
 		}
 		if (abilities.size() > MAX_ABILITIES) {
 			throw new IllegalStateException("Too many abilities");
@@ -229,7 +229,7 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 		abilities.remove(oldAbility);
 		abilities.add(newAbility);
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.ABILITY_WAS_REPLACED, new IntArrayMessageData(oldAbility.ordinal(), newAbility.ordinal())));
+			listener.messageReceived(new Message(HUDMessage.ABILITY_WAS_REPLACED, new IntArrayMessageData(oldAbility.ordinal(), newAbility.ordinal())));
 		}
 	}
 
@@ -238,16 +238,18 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 		int chunksOf10 = experienceOnCurrentChunk / 10;
 		experienceOnCurrentChunk = experienceOnCurrentChunk % 10;
 		if (chunksOf10 > 0) {
-			Sounds.play(ResourceLoader.createSound("powerup.wav", 2));
+			SoundHandler.play(ResourceLoader.createSound("powerup.wav", 2));
 		}
 		statpointsToSpend += chunksOf10;
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.NUM_STATPOINTS_CHANGED, new IntMessageData(amount)));
+			listener.messageReceived(new Message(HUDMessage.NUM_STATPOINTS_CHANGED, new IntMessageData(statpointsToSpend)));
 		}
 	}
 
 	public void trySpendStatpointOn(HeroStat stat) {
+		System.out.println("heroinfo.tryspendStatpointon"); //TODO
 		if (statpointsToSpend > 0) {
+			System.out.println("heroinfo. success tryspend statpointon"); //TODO
 			spendPointOnStat(stat);
 		}
 	}
@@ -268,7 +270,7 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 		}
 		stats.put(stat, newValue);
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.HERO_STAT_CHANGED, new IntArrayMessageData(stat.ordinal(), newValue)));
+			listener.messageReceived(new Message(HUDMessage.HERO_STAT_CHANGED, new IntArrayMessageData(stat.ordinal(), newValue)));
 		}
 	}
 
@@ -279,30 +281,17 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 		statpointsToSpend--;
 		addToStat(stat, 1);
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.NUM_STATPOINTS_CHANGED, new IntMessageData(statpointsToSpend)));
+			listener.messageReceived(new Message(HUDMessage.NUM_STATPOINTS_CHANGED, new IntMessageData(statpointsToSpend)));
 		}
 	}
 	
+	
 
-	@Override
-	public void messageReceived(Message message) {
-		switch(message.type){
-		case PRESSED_REPLACE_ABILITY:
-			AbilityType oldAbility =AbilityType.values()[ message.getNthDataValue(0)];
-			AbilityType newAbility =AbilityType.values()[ message.getNthDataValue(1)];
-			replaceAbilityWithNew(oldAbility, newAbility);
-			break;
-		case PRESSED_ADD_ABILITY:
-			newAbility = AbilityType.values()[ message.getNthDataValue(1)];
-			addAbility(newAbility);
-			break;
-		}
-	}
 
 	void notifyHeroUsedItem(ItemType item, int timeUntilCanUseAgain) {
 
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.ITEM_WAS_USED, new IntArrayMessageData(item.ordinal(), timeUntilCanUseAgain)));
+			listener.messageReceived(new Message(HUDMessage.ITEM_WAS_USED, new IntArrayMessageData(item.ordinal(), timeUntilCanUseAgain)));
 		}
 		dropItem(item);
 	}
@@ -313,13 +302,13 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 			throw new IllegalStateException("Why listen to other entities?");
 		}
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.HERO_HEALTH_CHANGED, new IntArrayMessageData(oldHealth, newHealth)));
+			listener.messageReceived(new Message(HUDMessage.HERO_HEALTH_CHANGED, new IntArrayMessageData(oldHealth, newHealth)));
 		}
 	}
 
 	void notifyHeroUsedAbility(AbilityType abilityType) {
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.HERO_USED_ABILITY, new IntArrayMessageData(abilityType.ordinal(), LoadedData
+			listener.messageReceived(new Message(HUDMessage.HERO_USED_ABILITY, new IntArrayMessageData(abilityType.ordinal(), LoadedData
 					.getAbilityData(abilityType).cooldown)));
 		}
 
@@ -327,7 +316,7 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 
 	void notifyHeroManaChanged(int oldMana, int mana, boolean dueToUsedAbility, int maxMana) {
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.HERO_MANA_CHANGED, new IntArrayMessageData(oldMana, mana, maxMana)));
+			listener.messageReceived(new Message(HUDMessage.HERO_MANA_CHANGED, new IntArrayMessageData(oldMana, mana, maxMana)));
 		}
 	}
 
@@ -335,7 +324,7 @@ public class HeroInfo implements MessageListener, EntityHealthListener, UnitMove
 	public void newLocation(int x, int y) {
 		boolean inRangeOfVendor = gameplayState.isHeroAliveAndCloseEnoughToMerchant();
 		for (MessageListener listener : listeners) {
-			listener.messageReceived(new Message(MessageType.HERO_IN_RANGE_OF_VENDOR, new BoolMessageData(inRangeOfVendor)));
+			listener.messageReceived(new Message(HUDMessage.HERO_IN_RANGE_OF_VENDOR, new BoolMessageData(inRangeOfVendor)));
 		}
 	}
 

@@ -27,7 +27,9 @@ public class ServerGame extends StateBasedGame implements Game{
 		gameplayState.setAllowedToRun(allowedToRun);
 	}
 	
-	public void messageReceived(Message message){
-		gameplayState.messageReceived(message);
+	public void messageReceivedFromClient(Message message){
+		gameplayState.messageReceivedFromClient(message);
+		
+		
 	}
 }

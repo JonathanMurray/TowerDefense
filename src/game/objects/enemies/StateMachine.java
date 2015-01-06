@@ -1,7 +1,7 @@
 package game.objects.enemies;
 
 import game.Player;
-import game.Waves.LaneType;
+import game.WaveHandler.LaneType;
 import game.objects.HeroInfo;
 import game.objects.Tower;
 

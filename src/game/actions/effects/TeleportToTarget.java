@@ -2,7 +2,7 @@ package game.actions.effects;
 
 import game.GamePlayStateInstance;
 import game.Map;
-import game.Physics;
+import game.PhysicsHandler;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
@@ -32,7 +32,7 @@ public class TeleportToTarget implements Effect{
 			throw new IllegalStateException("TeleportToTarget effect is only for units");
 		}
 		boolean isHero = actor instanceof Hero;
-		for(Point adjLocation : Physics.getAdjacentLocations(target.getLocation())){
+		for(Point adjLocation : PhysicsHandler.getAdjacentLocations(target.getLocation())){
 			if(isHero || ! ((Enemy)actor).isInTDMode()){
 				if(Map.blockedForHero(adjLocation.x, adjLocation.y)){
 					continue;

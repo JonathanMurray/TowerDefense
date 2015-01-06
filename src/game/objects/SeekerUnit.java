@@ -3,7 +3,7 @@ package game.objects;
 import game.Direction;
 import game.DirectionSpriteSet;
 import game.Map;
-import game.Physics;
+import game.PhysicsHandler;
 import game.SoundWrapper;
 
 import java.awt.Point;
@@ -71,7 +71,7 @@ public abstract class SeekerUnit extends Unit {
 	}
 
 	public boolean existsPathToSomeAdjacentLocation(Point centerLocation) {
-		Point[] adjacentLocations = Physics
+		Point[] adjacentLocations = PhysicsHandler
 				.getAdjacentLocations(centerLocation);
 		for (Point adjLocation : adjacentLocations) {
 			if (getLocation().equals(adjLocation)) {
@@ -85,7 +85,7 @@ public abstract class SeekerUnit extends Unit {
 	}
 
 	public void seekToRandomAdjacentLocation(Point centerLocation) {
-		Point[] adjacentLocations = Physics
+		Point[] adjacentLocations = PhysicsHandler
 				.getAdjacentLocations(centerLocation);
 		List<Point> asList = Arrays.asList(adjacentLocations);
 		Collections.shuffle(asList);
@@ -100,16 +100,16 @@ public abstract class SeekerUnit extends Unit {
 	}
 
 	public void seek1StepToOtherAdjacentLocation(Point centerLocation) {
-		if (!Physics.arePointsAdjacent(centerLocation, getLocation())) {
+		if (!PhysicsHandler.arePointsAdjacent(centerLocation, getLocation())) {
 			new IllegalArgumentException(
 					"currently not adjacent to centerLocation!").printStackTrace(); 
 			return; //TODO 
 			//BUG  Why does this happen sometimes?
 		}
-		Point[] adjacentLocations = Physics
+		Point[] adjacentLocations = PhysicsHandler
 				.getAdjacentLocations(centerLocation);
 		for (Point adjLocation : adjacentLocations) {
-			if (Physics
+			if (PhysicsHandler
 					.arePointsWithinDistance(getLocation(), adjLocation, 1.1)) {
 				seekToLocation(adjLocation);
 				if (isSeeking()) {
@@ -133,7 +133,7 @@ public abstract class SeekerUnit extends Unit {
 	public void seekAwayFromLocation(Point location) {
 		Direction direction = Direction.getMostFittingDirection(getLocation().x
 				- location.x, getLocation().y - location.y);
-		Point oneStepAway = Physics.getRelativeLocation(getLocation(),
+		Point oneStepAway = PhysicsHandler.getRelativeLocation(getLocation(),
 				direction.getVector());
 		seekToLocation(oneStepAway);
 		if (path == null) {

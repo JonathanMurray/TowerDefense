@@ -1,11 +1,11 @@
 package applicationSpecific;
 
-import game.Entities;
+import game.EntityHandler;
 import game.OfflineGamePlayState;
 import game.Player;
 import game.ResourceLoader;
 import game.SoundWrapper;
-import game.Sounds;
+import game.SoundHandler;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.HeroInfo;
 import game.objects.PowerupItem;

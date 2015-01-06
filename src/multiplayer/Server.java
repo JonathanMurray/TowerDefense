@@ -1,17 +1,23 @@
 package multiplayer;
 
-import game.OfflinePlayerInputHandler;
+import game.PlayerInputHandler;
+import game.Player;
 import game.ServerGame;
+import game.objects.HeroInfo;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import messages.ClientReady;
 import messages.IntArrayMessageData;
 import messages.IntArraysMessageData;
+import messages.IntMessageData;
 import messages.Message;
 import messages.MessageType;
+import messages.ServerSetupDone;
+import messages.UserInputMessage;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
@@ -22,6 +28,9 @@ import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
+import applicationSpecific.AbilityType;
+import applicationSpecific.ItemType;
+import applicationSpecific.TowerType;
 import rendering.HUD;
 
 public class Server{
@@ -31,9 +40,8 @@ public class Server{
 	ServerGame game;
 	private boolean setupIsDone = false;
 	private boolean connectedToClients = false;
-	private boolean clientsAreReadyToGo = false;
+	private boolean clientsAreReady = false;
 	List<IoSession> clientSessions = new ArrayList<IoSession>();
-	private HUD hud;
 	
 	private List<Message> bufferedSetupMessagesForClients = new ArrayList<Message>();
 
@@ -48,14 +56,14 @@ public class Server{
 		acceptor.setHandler(new ServerIoHandler());
 		acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 		acceptor.bind(new InetSocketAddress(PORT));
-		System.out.println(acceptor);
+		System.out.println("NioDatagramAcceptor: " + acceptor);
 		
 		try {
 			game = new ServerGame(this);
 			AppGameContainer container = new AppGameContainer(game);
-			System.out.println("server. before container.start()");
+			System.out.println("Starting server game ...");
 			container.start();
-			System.out.println("server. after container.start()");
+			System.out.println("Started server game.");
 		} catch (SlickException e) {
 			e.printStackTrace();
 			System.exit(0);
@@ -63,10 +71,7 @@ public class Server{
 		
 		
 	}
-	
-	public void notifyHUDCreated(HUD hud){
-		this.hud = hud;
-	}
+
 
 	public static void main(String[] args) throws IOException {
 		System.out.println("Starting server...  (time = " + (System.currentTimeMillis() % 1000000) + ")");
@@ -87,9 +92,9 @@ public class Server{
 			clientSessions.add(session);
 			connectedToClients = true;
 			if(setupIsDone){
-				System.out.println("NOTIFY CLIENTS SETUP DONE NOW");
+				System.out.println("NOTIFY NEW CLIENTS 'SETUP DONE' NOW");
 				for(IoSession s : clientSessions){
-					s.write(new Message(MessageType.PLAYER_AND_HERO_SETUP_DONE, null));
+					s.write(new Message(ServerSetupDone.SERVER_SETUP_DONE, null));
 				}
 			}
 		}
@@ -99,69 +104,35 @@ public class Server{
 			Message message = (Message) objectMessage;
 			//System.out.println("received: "  + message);
 			
-			if(message.type == MessageType.CLIENT_READY){
+			if(message.type instanceof ClientReady){
 				System.out.println("SERVER RECEIVED CLIENT READY");
 				game.setAllowedToRun(true);
-				clientsAreReadyToGo = true;
+				clientsAreReady = true;
 				for(Message savedMessage : bufferedSetupMessagesForClients){
 					sendMessageToClients(savedMessage);
 				}
 				return;
 			}
 			
-			if(!clientsAreReadyToGo){
+			if(!clientsAreReady){
 				bufferedSetupMessagesForClients.add(message);
 				return;
 			}
 			
-			switch(message.type){
-			
-			case CLIENT_PRESSED_KEYS:
-				IntArraysMessageData d1 = (IntArraysMessageData)message.data;
-				OfflinePlayerInputHandler.handleKeyboardInput(d1.array1, d1.array2, hud);
-				break;
-			case CLIENT_PRESSED_LEFT_MOUSE:
-				IntArrayMessageData d2 = (IntArrayMessageData)message.data;
-				OfflinePlayerInputHandler.handleLeftMousePressed(d2.array[0], d2.array[1], hud);
-				break;
-			case CLIENT_PRESSED_RIGHT_MOUSE:
-				IntArrayMessageData d3 = (IntArrayMessageData)message.data;
-				OfflinePlayerInputHandler.handleRightMousePressed(d3.array[0], d3.array[1], hud);
-				break;
-			case ADD_VISUAL_EFFECT:
-				break;
-			case ITEM_WAS_ADDED:
-				break;
-			case ITEM_WAS_REMOVED:
-				break;
-			case MONEY_WAS_UPDATED:
-				break;
-			case PLAYER_AND_HERO_SETUP_DONE:
-				break;
-			case PLAYER_LIFE_WAS_UPDATED:
-				break;
-			case REMOVE_CLIENT_ENTITY:
-				break;
-			case TOWER_WAS_ADDED:
-				break;
-			case TOWER_WAS_UNLOCKED:
-				break;
-			case UPDATE_PHYSICS:
-				break;
-			default:
-				game.messageReceived(message);
+			if(message.type instanceof UserInputMessage){
+				game.messageReceivedFromClient(message);
 			}
-			
 		}
-
+		
 		@Override
 		public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
 			System.out.println("IDLE " + session.getIdleCount(status));
 		}
+			
 	}
-	
+
 	public void sendMessageToClients(Message message){
-		if(!clientsAreReadyToGo){
+		if(!clientsAreReady){
 			bufferedSetupMessagesForClients.add(message);
 			return;
 		}
@@ -174,15 +145,15 @@ public class Server{
 	public void notifyClientsSetupDone(){
 		//THIS SHOULD NOT CALL SENDMESSAEGETOCLIENTS
 		//It would be blocked by the fact that clients are not ready for (normal) messages yet.
-		
+		setupIsDone = true;
 		if(connectedToClients){
-			System.out.println("NOTIFY CLIENTS SETUP DONE NOW");
+			System.out.println("NOTIFY CLIENTS 'SETUP DONE' NOW");
 			for(IoSession session : clientSessions){
-				session.write(new Message(MessageType.PLAYER_AND_HERO_SETUP_DONE, null));
+				session.write(new Message(ServerSetupDone.SERVER_SETUP_DONE, null));
 			}
 		}else{
 			System.out.println("CANT NOTIFY CLIENTS NOW: WILL DO SOON.");
-			setupIsDone = true;
+//			setupIsDone = true;
 		}
 	}
 }

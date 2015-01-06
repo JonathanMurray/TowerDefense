@@ -3,9 +3,9 @@ package game.objects;
 import game.DeathListener;
 import game.EntityHealthListener;
 import game.Map;
-import game.Physics;
+import game.PhysicsHandler;
 import game.SoundWrapper;
-import game.Sounds;
+import game.SoundHandler;
 import game.actions.Action;
 import game.actions.Parameters;
 import game.buffs.Buff;
@@ -24,7 +24,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
 import rendering.RenderUtil;
-import rendering.OfflineRenderableEntity;
+import rendering.ClientRenderableEntity;
 import rendering.RenderableEntity;
 
 public abstract class Entity implements VisibleObject {
@@ -314,7 +314,7 @@ public abstract class Entity implements VisibleObject {
 	}
 
 	public boolean isLocationAdjacent(Point location) {
-		return isLocationWithinDistance(location, Physics.getAdjacencyDistance());
+		return isLocationWithinDistance(location, PhysicsHandler.getAdjacencyDistance());
 	}
 
 	public void gainHealth(int amount) {
@@ -404,7 +404,7 @@ public abstract class Entity implements VisibleObject {
 		alive = false;
 		Map.instance().setLocationBlockedByEntity(x, y, false);
 		if (wasKilled && deathSound != null) {
-			Sounds.play(deathSound);
+			SoundHandler.play(deathSound);
 		}
 		for (DeathListener listener : deathListeners) {
 			listener.entityDied(this, wasKilled);

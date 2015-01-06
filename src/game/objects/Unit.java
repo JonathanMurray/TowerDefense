@@ -203,6 +203,14 @@ public abstract class Unit extends Entity implements Mover {
 		movementCooldown = (int) ((double) baseMovementCooldown / totalMultiplier);
 		timeUntilAlignedToTile = (int) ((double) movementCooldown * ((double) timeUntilAlignedToTile / (double) oldMovementCooldown));
 		notifyListenersAttributeChanged(EntityAttribute.MOVEMENT_SPEED, getPrettifiedMovementSpeed());
+		
+		updatePixelLocation();
+		renderableEntity.setLocationAndSpeed(
+				getPixelLocation(), 
+				new Point(
+						(int) (getDirection().dx * Map.getTileWidth() / (float) movementCooldown * 1000f), 
+						(int) (getDirection().dy * Map.getTileHeight() / (float) movementCooldown * 1000f))
+				);
 	}
 
 	public int getPrettifiedMovementSpeed() {
@@ -316,6 +324,7 @@ public abstract class Unit extends Entity implements Mover {
 		} else {
 			isUnderStun = true;
 			timeRemainingStunned = stunDuration;
+			notifyRenderableEntityNoMovement();
 		}
 	}
 
@@ -363,7 +372,12 @@ public abstract class Unit extends Entity implements Mover {
 	}
 
 	void notifyStunFaded() {
-
+		renderableEntity.setLocationAndSpeed(
+				getPixelLocation(), 
+				new Point(
+						(int) (getDirection().dx * Map.getTileWidth() / (float) movementCooldown * 1000f), 
+						(int) (getDirection().dy * Map.getTileHeight() / (float) movementCooldown * 1000f))
+				);
 	}
 
 	private void handleChanceToMove() {
@@ -371,7 +385,7 @@ public abstract class Unit extends Entity implements Mover {
 			tryToMove();
 			boolean didMove = !(x == previousX && y == previousY);
 			if (didMove) {
-				direction = Direction.getDirection(x - previousX, y - previousY);
+				setDirection(Direction.getDirection(x - previousX, y - previousY));
 				timeSinceLastMove = 0;
 				timeUntilAlignedToTile += movementCooldown;
 			} else {

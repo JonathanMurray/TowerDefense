@@ -17,6 +17,9 @@ public class AttributeMultiplierBuff extends Buff{
 	public AttributeMultiplierBuff(EntityAttribute attribute, double multiplier, int duration, String id,
 			Animation animation) {
 		super(id, animation);
+		if(id.equals("RUN_BUFF")){
+			System.out.println(animation); //TODO
+		}
 		this.attribute = attribute;
 		this.multiplier = multiplier;
 		this.duration = duration;
@@ -28,7 +31,7 @@ public class AttributeMultiplierBuff extends Buff{
 		Unit targetUnit = (Unit) target;
 		try {
 			targetUnit.addAttributeMultiplier(attribute, id
-					+ "SPEED_MULTIPLY", multiplier); //TODO
+					+ "BUFF_ATTRIB_MULTIPLY", multiplier); //TODO
 		} catch (OperationNotSupportedException e) {
 			e.printStackTrace();
 			System.exit(0);
@@ -41,7 +44,7 @@ public class AttributeMultiplierBuff extends Buff{
 		Unit targetUnit = (Unit) target;
 		try {
 			targetUnit.removeAttributeMultiplier(attribute, id
-					+ "SPEED_MULTIPLY");//TODO
+					+ "BUFF_ATTRIB_MULTIPLY");//TODO
 		} catch (OperationNotSupportedException e) {
 			e.printStackTrace();
 			System.exit(0);

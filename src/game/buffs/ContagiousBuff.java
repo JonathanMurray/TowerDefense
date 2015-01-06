@@ -1,6 +1,6 @@
 package game.buffs;
 
-import game.Entities;
+import game.EntityHandler;
 import game.objects.Entity;
 import game.objects.enemies.Enemy;
 
@@ -48,7 +48,7 @@ public class ContagiousBuff extends Buff {
 	}
 
 	private void spread(Entity carrier) {
-		for (Entity entity : Entities.getEntitiesWithinRange(
+		for (Entity entity : EntityHandler.getEntitiesWithinRange(
 				carrier.getLocation(), range, carrier.getTeam())) {
 			if (entity != carrier) {
 				entity.receiveBuff(actualBuff.getCopy());

@@ -57,6 +57,7 @@ public class ResourceLoader {
 			e.printStackTrace();
 			System.exit(0);
 		}
+		System.exit(0);
 		return null;
 	}
 
@@ -67,8 +68,12 @@ public class ResourceLoader {
 	}
 
 	public static Image createBlankImage(int width, int height) {
-		System.out.println("createBlankImage" + " " + width + "," + height);//TODO
+//		System.out.println("createBlankImage" + " " + width + "," + height);//TODO
 //		return new Image(new EmptyImageData(width, height));
+		if(!BLANK_IMAGES.containsKey(new Dimension(width, height))){
+			System.err.println("createBlankImage(" +  width + " , " + height + ").   invalid arguments.");
+			return BLANK_IMAGES.values().iterator().next();
+		}
 		return BLANK_IMAGES.get(new Dimension(width, height));
 	}
 

@@ -1,6 +1,6 @@
 package game;
 
-import game.Waves.WavesData;
+import game.WaveHandler.WavesData;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -131,10 +131,10 @@ public class SplashScreenState extends BasicGameState {
 		
 		
 		if(!mapCreated){
-			System.out.println("\n\n\n");
-			System.out.println("before map constr in Splash update");
+			System.out.println("\n\n");
+			System.out.println("Creating map...");
 			new Map();
-			System.out.println("after map constr in Splash update");
+			System.out.println("Created map.");
 			mapCreated = true;
 			return;
 		}
@@ -142,14 +142,14 @@ public class SplashScreenState extends BasicGameState {
 		
 		
 		if(!musicLoaded){
-			Sounds.loadMusic();
+			SoundHandler.loadMusic();
 			musicLoaded = true;
 			return;
 		}
 		
 		if(!wavesLoaded){
 			try {
-				gameplayState.setWaves(new Waves(loadWavesDataFromFile(Paths.WAVES_PATH), gameplayState));
+				gameplayState.setWaves(new WaveHandler(loadWavesDataFromFile(Paths.WAVES_PATH), gameplayState));
 				wavesLoaded = true;
 				return;
 			} catch (FileNotFoundException e) {
@@ -233,9 +233,11 @@ public class SplashScreenState extends BasicGameState {
 				wave = new Wave(waveDurationInSeconds * 1000);
 				lineAfterSpace.close();
 			} else {
-				int spawnTime = line.nextInt();
-				EnemyType enemyData = EnemyType.valueOf(line.next());
-				wave.addSpawnTime(spawnTime, enemyData);
+				if(!line.hasNext("//.*")){
+					int spawnTime = line.nextInt();
+					EnemyType enemyData = EnemyType.valueOf(line.next());
+					wave.addSpawnTime(spawnTime, enemyData);
+				}
 			}
 		}
 		waves.add(wave);

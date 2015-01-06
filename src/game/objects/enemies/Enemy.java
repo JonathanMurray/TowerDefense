@@ -8,7 +8,7 @@ import game.Map;
 import game.Player;
 import game.RangedAttack;
 import game.ResourceLoader;
-import game.Waves.LaneType;
+import game.WaveHandler.LaneType;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
 import game.objects.HeroInfo;
@@ -22,7 +22,7 @@ import java.util.List;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
-import rendering.OfflineRenderableEntity;
+import rendering.ClientRenderableEntity;
 
 import applicationSpecific.EnemyType;
 
@@ -94,7 +94,7 @@ public class Enemy extends SeekerUnit {
 		if(stats.isImmuneToStun){
 			setCompletelyImmuneToStun();
 		}
-		setRenderableEntity(OfflineRenderableEntity.createEnemy(getPixelLocation(), stats.spriteSet, getDirection(),(int)(health/(float)maxHealth*100)));
+		setRenderableEntity(ClientRenderableEntity.createEnemy(getPixelLocation(), stats.spriteSet, getDirection(),(int)(health/(float)maxHealth*100)));
 	}
 
 	private void setupData(EnemyData stats) {

@@ -2,61 +2,6 @@ package messages;
 
 import java.io.Serializable;
 
-import applicationSpecific.AbilityType;
-import applicationSpecific.ItemType;
-import applicationSpecific.TowerType;
-
-public enum MessageType implements Serializable{
-	
-	//Setup 
-	CLIENT_READY,
-	PLAYER_AND_HERO_SETUP_DONE,
-	
-	//Server to clients (shallow graphics)
-	ADD_VISUAL_EFFECT,
-	REMOVE_CLIENT_ENTITY,
-	UPDATE_PHYSICS,
-	
-	
-	
-	PLAYER_LIFE_WAS_UPDATED,
-	MONEY_WAS_UPDATED,
-	
-	
-	
-	TOWER_WAS_ADDED,
-	TOWER_WAS_UNLOCKED,
-	ITEM_WAS_ADDED,
-	ITEM_WAS_REMOVED,
-	ITEM_WAS_REPLACED,
-	
-	TOWER_WAS_SELECTED,
-	
-	
-
-	//Hero info listener
-	ABILITY_WAS_ADDED,
-	ABILITY_WAS_REPLACED,
-	HERO_DIED,
-	HERO_REVIVED,
-	HERO_STAT_CHANGED,
-	NUM_STATPOINTS_CHANGED,
-	HERO_HEALTH_CHANGED,
-	HERO_MANA_CHANGED,
-	HERO_IN_RANGE_OF_VENDOR,
-	ITEM_WAS_EQUIPPED,
-	ITEM_WAS_USED,
-	ITEM_WAS_DROPPED,
-	HERO_USED_ABILITY,
-	
-	//Client input to server
-	CLIENT_PRESSED_KEYS,
-	CLIENT_PRESSED_LEFT_MOUSE,
-	CLIENT_PRESSED_RIGHT_MOUSE,
-	PRESSED_BUY_ITEM,
-	PRESSED_UNLOCK_TOWER,
-	PRESSED_REPLACE_ABILITY,
-	PRESSED_ADD_ABILITY,
-}
+public interface MessageType extends Serializable{}
 
  

@@ -68,7 +68,7 @@ public class Attack {
 	}
 
 	public double getRange() {
-		return Physics.getAdjacencyDistance();
+		return PhysicsHandler.getAdjacencyDistance();
 	}
 
 	public boolean isReady() {
@@ -82,7 +82,7 @@ public class Attack {
 	public void attackTarget(Entity attacker, Entity target,
 			double damageMultiplier) {
 		if (sound != null) {
-			Sounds.play(sound);
+			SoundHandler.play(sound);
 		}
 
 		random = new Random();

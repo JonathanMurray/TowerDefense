@@ -1,7 +1,7 @@
 package game.objects;
 
 
-import game.Entities;
+import game.EntityHandler;
 import game.Map;
 import game.RangedAttack;
 import game.TechUpgrade;
@@ -40,7 +40,7 @@ public class SuperTower extends Entity {
 		attack.update(delta);
 		if (attack.isReady()) {
 			try {
-				Entity enemy = Entities.getEntityWithinRange(getLocation(),
+				Entity enemy = EntityHandler.getEntityWithinRange(getLocation(),
 						attack.getRange(), Team.EVIL);
 				attack.attackTarget(this, enemy, totalDamageMultiplier);
 			} catch (Exception e) {

@@ -1,8 +1,8 @@
 package game.actions.targetPickers;
 
-import game.Entities;
+import game.EntityHandler;
 import game.GamePlayStateInstance;
-import game.Physics;
+import game.PhysicsHandler;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
@@ -31,14 +31,14 @@ public class TargetOneInFront implements TargetPicker{
 		List<Entity> targets = new ArrayList<Entity>();
 		for (Point vector : frontVectors) {
 			try {
-				Point targetLocation = Physics.getRelativeLocation(
+				Point targetLocation = PhysicsHandler.getRelativeLocation(
 						actor.getLocation(), vector);
-				Entity target = Entities.getEntityOnLocation(targetLocation, targetTeam);
+				Entity target = EntityHandler.getEntityOnLocation(targetLocation, targetTeam);
 				targets.add(target);
 			} catch (EntityNotFound e) {}
 		}
 		if(targets.size() == 0){
-			Point oneAhead = Physics.getRelativeLocation(actor.getLocation(), ((Unit)actor).getDirection(), 1);
+			Point oneAhead = PhysicsHandler.getRelativeLocation(actor.getLocation(), ((Unit)actor).getDirection(), 1);
 			if(animation != null){
 				GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect(oneAhead, animation));
 			}

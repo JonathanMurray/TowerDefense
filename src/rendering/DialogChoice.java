@@ -26,6 +26,9 @@ import applicationSpecific.SuperTowerType;
 	}
 
 	 DialogChoice(Image icon, String text, String tooltip) {
+		if(icon == null){
+			throw new NullPointerException("icon == null, text ==" + text + " tooltip = " + tooltip);
+		}
 		this.icon = icon;
 		this.text = text;
 		this.tooltip = tooltip;

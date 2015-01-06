@@ -1,8 +1,8 @@
 package game.actions.targetPickers;
 
-import game.Entities;
+import game.EntityHandler;
 import game.GamePlayStateInstance;
-import game.Physics;
+import game.PhysicsHandler;
 import game.actions.ParameterName;
 import game.actions.Parameters;
 import game.objects.AnimationBasedVisualEffect;
@@ -47,11 +47,11 @@ public class TargetRectangleAhead implements TargetPicker {
 		for (int stepsForward = skipNFirstSquares + 1; stepsForward <= skipNFirstSquares + length; stepsForward++) {
 			for (int stepsRight = -(width-1)/2; stepsRight <= (width-1)/2; stepsRight++) {
 				try {
-					Point targetLocation = Physics.getRelativeLocation(actor.getLocation(), ((Unit)actor).getDirection(), stepsForward, stepsRight);
+					Point targetLocation = PhysicsHandler.getRelativeLocation(actor.getLocation(), ((Unit)actor).getDirection(), stepsForward, stepsRight);
 					if(renderAnimations && animation != null){
-						GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect( Physics.getPixelCenterLocation(targetLocation),animation));
+						GamePlayStateInstance.INSTANCE.addSpecialEffect(new AnimationBasedVisualEffect( PhysicsHandler.getPixelCenterLocation(targetLocation),animation));
 					}	
-					Entity target = Entities.getEntityOnLocation(targetLocation, targetTeam);
+					Entity target = EntityHandler.getEntityOnLocation(targetLocation, targetTeam);
 					targets.add(target);
 				} catch (EntityNotFound e) {}
 			}

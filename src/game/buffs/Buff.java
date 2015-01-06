@@ -17,20 +17,12 @@ public abstract class Buff {
 			throw new IllegalArgumentException("Invalid buffID = " + id);
 		}
 		this.id = id;
-		if(id.equals("JIGGLYPUFF_SLOW")){
-			System.out.println("jiggly buff. duration = " + getTotalDuration());
-		}
 	}
 
 	public Buff(String id, Animation animation) {
 		this.id = id;
 		this.animation = animation;
 	}
-	
-	//public void resetForReuse(){
-	//	timeSinceAttachment = 0;
-	//	hasRequestedRemoval = false;
-	//}
 	
 	public final void resetDuration(){
 		timeSinceAttachment = 0;

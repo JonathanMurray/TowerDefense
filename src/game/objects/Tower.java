@@ -1,6 +1,6 @@
 package game.objects;
 
-import game.Entities;
+import game.EntityHandler;
 import game.LoadedData;
 import game.Map;
 import game.RangedAttack;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.Animation;
 
-import rendering.OfflineRenderableEntity;
+import rendering.ClientRenderableEntity;
 import applicationSpecific.TowerType;
 
 public class Tower extends Entity {
@@ -42,7 +42,7 @@ public class Tower extends Entity {
 		if(attack != null){
 			attackPixelRange = (int)(attack.getRange()*Map.getTileWidth()); 
 		}
-		setRenderableEntity(OfflineRenderableEntity.createTower(getPixelLocation(), stats.sprite, 100));
+		setRenderableEntity(ClientRenderableEntity.createTower(getPixelLocation(), stats.sprite, 100));
 	}
 	
 	public int getMaxHealth(){
@@ -71,7 +71,7 @@ public class Tower extends Entity {
 		attack.update(delta);
 		if (attack.isReady()) {
 			try {
-				Entity enemy = Entities.getEntityWithinRange(getLocation(),
+				Entity enemy = EntityHandler.getEntityWithinRange(getLocation(),
 						attack.getRange(), Team.EVIL);
 				attack.attackTarget(this, enemy, totalDamageMultiplier);
 			} catch (EntityNotFound e) {

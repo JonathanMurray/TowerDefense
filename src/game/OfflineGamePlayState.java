@@ -4,6 +4,7 @@ import game.buffs.Buff;
 import game.objects.AnimationBasedVisualEffect;
 import game.objects.Entity;
 import game.objects.Hero;
+import game.objects.HeroData;
 import game.objects.HeroInfo;
 import game.objects.HeroStat;
 import game.objects.ItemOnGround;
@@ -20,6 +21,11 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import messages.HUDMessage;
+import messages.Message;
+import messages.MessageListener;
+import messages.UserInputMessage;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -31,7 +37,6 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import rendering.HUD;
 import rendering.HUD_keyChars;
-
 import applicationSpecific.AbilityType;
 import applicationSpecific.HeroType;
 import applicationSpecific.ItemType;
@@ -50,7 +55,7 @@ public class OfflineGamePlayState extends GamePlayState{
 	private static final Point HERO_SPAWN = new Point(25, 17);// new
 																// Point(20,20);
 
-	private static Waves waves;
+	private static WaveHandler waves;
 
 	private static ArrayList<VisibleObject> visibleObjects;
 	private static ArrayList<VisibleObject> objectsToBeAdded;
@@ -62,7 +67,6 @@ public class OfflineGamePlayState extends GamePlayState{
 	private boolean hasSetup = false;
 	private boolean render;
 
-	private Game game;
 	
 	public OfflineGamePlayState(boolean render) {
 		this.render = render;
@@ -70,7 +74,6 @@ public class OfflineGamePlayState extends GamePlayState{
 
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException {
-		this.game = (Game) game;
 		super.enter(container, game);
 		if (!hasSetup) {
 			setup(container);
@@ -83,8 +86,8 @@ public class OfflineGamePlayState extends GamePlayState{
 		System.out.println("OfflineGamePLayState.setup()");
 		HeroType heroType = HeroType.HERO;
 
-		HUD_keyChars keyChars = new HUD_keyChars(OfflinePlayerInputHandler.getStatChar(HeroStat.STRENGTH), OfflinePlayerInputHandler.getStatChar(HeroStat.DEXTERITY),
-				OfflinePlayerInputHandler.getStatChar(HeroStat.INTELLIGENCE), OfflinePlayerInputHandler.getAbilityChars(), OfflinePlayerInputHandler.getItemChars());
+		HUD_keyChars keyChars = new HUD_keyChars(PlayerInputHandler.getStatChar(HeroStat.STRENGTH), PlayerInputHandler.getStatChar(HeroStat.DEXTERITY),
+				PlayerInputHandler.getStatChar(HeroStat.INTELLIGENCE), PlayerInputHandler.getAbilityChars(), PlayerInputHandler.getItemChars());
 		hud = new HUD(container, keyChars, Player.MAX_LIFE, HeroInfo.MAX_ABILITIES, HeroInfo.MAX_USABLE_ITEMS);
 
 		HeroInfo.INSTANCE.addListener(hud);
@@ -93,13 +96,11 @@ public class OfflineGamePlayState extends GamePlayState{
 		Player.INSTANCE.addListener(hud);
 		Player.INSTANCE.setup(this);
 
-		hud.addInputListener(HeroInfo.INSTANCE);
-		hud.addInputListener(Player.INSTANCE);
-		hud.addInputListener(OfflinePlayerInputHandler.INSTANCE);
+		PlayerInputHandler.towerWasSelected(TowerType.DROWSER); //TODO Must be set, but should be more dynamic than this
 
-		Sounds.mute(true); // TODO
+		SoundHandler.mute(true); // TODO
 		// Sounds.musicVolume = 0;
-		Sounds.playNextMusic();
+		SoundHandler.playNextMusic();
 
 		visibleObjects = new ArrayList<VisibleObject>();
 		objectsToBeAdded = new ArrayList<VisibleObject>();
@@ -259,7 +260,7 @@ public class OfflineGamePlayState extends GamePlayState{
 		// container.getInput().setOffset(-GRAPHICS_X_TRANSLATE,
 		// -GRAPHICS_Y_TRANSLATE);
 
-		Sounds.update(delta);
+		SoundHandler.update(delta);
 		hud.update(container.getInput(), delta);
 		waves.handleWaves(delta);
 		waves.handleInput(container.getInput());
@@ -267,14 +268,14 @@ public class OfflineGamePlayState extends GamePlayState{
 		HeroInfo.INSTANCE.update(delta);
 		addVisibleObjects();
 
-		OfflinePlayerInputHandler.handleKeyboardInput(container.getInput(),  hud);
+		PlayerInputHandler.handleKeyboardInput(container.getInput(),  hud);
 		if (!hud.isMouseOverHUDElements(container.getInput())) {
-			OfflinePlayerInputHandler.handleMouseInput(container.getInput(), delta, hud);
+			PlayerInputHandler.handleMouseInput(container.getInput(), delta, hud);
 		}
 		hud.handleInput(container.getInput());
 
 		Player.INSTANCE.handleMouseOverTowerInput(container.getInput(), delta, hud);
-		Entities.handleMouseOverEnemyInput(container.getInput(), delta, hud);
+		EntityHandler.handleMouseOverEnemyInput(container.getInput(), delta, hud);
 	}
 
 	public void notifyHeroRespawned(Hero hero) {
@@ -348,7 +349,7 @@ public class OfflineGamePlayState extends GamePlayState{
 	// }
 	// }
 
-	public void setWaves(Waves waves) {
+	public void setWaves(WaveHandler waves) {
 		System.out.println("set waves to " + waves);
 		OfflineGamePlayState.waves = waves;
 	}
@@ -375,7 +376,7 @@ public class OfflineGamePlayState extends GamePlayState{
 		}
 
 		if (container.getInput().isKeyPressed(Input.KEY_M)) {
-			Sounds.toggleMute();
+			SoundHandler.toggleMute();
 		}
 
 		if (container.getInput().isKeyPressed(Input.KEY_U)) {
@@ -437,7 +438,7 @@ public class OfflineGamePlayState extends GamePlayState{
 				it.remove();
 			}
 		}
-		Entities.removeDeadEnemies();
+		EntityHandler.removeDeadEnemies();
 		Player.INSTANCE.removeDeadTowers();
 	}
 
@@ -445,7 +446,7 @@ public class OfflineGamePlayState extends GamePlayState{
 		for (VisibleObject object : objectsToBeAdded) {
 			visibleObjects.add(object);
 			if (object instanceof Enemy) {
-				Entities.notifyEnemyWasAdded((Enemy) object);
+				EntityHandler.notifyEnemyWasAdded((Enemy) object);
 				((Enemy) object).notifyBirth();
 			}
 		}
@@ -473,6 +474,7 @@ public class OfflineGamePlayState extends GamePlayState{
 	public void setAllowedToRun(boolean b) {
 		//This is only for server version of gameplaystate
 	}
+
 
 
 }

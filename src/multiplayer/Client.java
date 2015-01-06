@@ -1,16 +1,10 @@
 package multiplayer;
 
-	import game.ClientGame;
-import game.OfflineGame;
+import game.ClientGame;
 
-import java.awt.Point;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.util.Scanner;
 
-import messages.IntMessageData;
 import messages.Message;
-import messages.MessageType;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.future.ConnectFuture;
@@ -19,19 +13,16 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
-
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.ScalableGame;
 import org.newdawn.slick.SlickException;
 
-import applicationSpecific.TowerType;
-
-	public class Client{
+public class Client{
 		
-		ClientGame game;
-		
-		private static final String HOSTNAME = "192.168.1.3";
+	ClientGame game;
+	
+	private static final String HOSTNAME = "192.168.1.3";
 //	private static final String HOSTNAME = "127.0.0.1";
 
 	private static final long CONNECT_TIMEOUT = 3 * 1000L;

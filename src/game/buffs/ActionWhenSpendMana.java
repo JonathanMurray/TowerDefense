@@ -1,15 +1,16 @@
 package game.buffs;
 
 import game.LoadedData;
-import game.MessageListener;
 import game.actions.Action;
 import game.actions.ContextParameterMap;
 import game.actions.ContextVariable;
 import game.actions.Parameters;
 import game.objects.Entity;
 import game.objects.HeroInfo;
+import messages.HUDMessage;
 import messages.IntMessageData;
 import messages.Message;
+import messages.MessageListener;
 import messages.MessageType;
 
 import org.newdawn.slick.Animation;
@@ -64,7 +65,7 @@ public class ActionWhenSpendMana extends Buff implements MessageListener{
 
 	@Override
 	public void messageReceived(Message message) {
-		if(message.type == MessageType.HERO_USED_ABILITY){
+		if(message.type == HUDMessage.HERO_USED_ABILITY){
 			System.out.println("ActionWhenSPendMana.heroUsedAbility");
 			AbilityType ability = AbilityType.values()[((IntMessageData)message.data).value];
 			int manaCost = LoadedData.getAbilityData(ability).manaCost;

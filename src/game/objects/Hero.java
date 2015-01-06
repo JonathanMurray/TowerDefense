@@ -2,8 +2,7 @@ package game.objects;
 
 import game.AbilityData;
 import game.LoadedData;
-import game.MessageListener;
-import game.Sounds;
+import game.SoundHandler;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -12,12 +11,14 @@ import java.util.Iterator;
 
 import javax.naming.OperationNotSupportedException;
 
+import messages.HUDMessage;
 import messages.IntMessageData;
 import messages.Message;
+import messages.MessageListener;
 
 import org.newdawn.slick.Animation;
 
-import rendering.OfflineRenderableEntity;
+import rendering.ClientRenderableEntity;
 import applicationSpecific.AbilityType;
 import applicationSpecific.HeroType;
 import applicationSpecific.ItemType;
@@ -61,7 +62,7 @@ public class Hero extends StepperUnit {
 
 			@Override
 			public void messageReceived(Message message) {
-				switch (message.type) {
+				switch ((HUDMessage)message.type) {
 				case ABILITY_WAS_REPLACED:
 					AbilityType oldAbility = AbilityType.values()[message.getNthDataValue(0)];
 					AbilityType newAbility = AbilityType.values()[message.getNthDataValue(1)];
@@ -75,12 +76,18 @@ public class Hero extends StepperUnit {
 					stats = LoadedData.getAbilityData(ability);
 					abilitiesWithTimeSinceUse.put(ability, stats.cooldown);
 					break;
+				
+				default:
+					break;
 				}
 			}
 		});
 
-		setRenderableEntity(OfflineRenderableEntity.createHero(getPixelLocation(), stats.spriteSet, getDirection(),
+		setRenderableEntity(ClientRenderableEntity.createHero(getPixelLocation(), stats.spriteSet, getDirection(),
 				(int) (health / (float) maxHealth * 100), (int) (mana / (float) maxMana * 100)));
+		
+		//TODO Should be offline only when in offline game.
+		//Should be ServerRenderableEntity when on server
 
 	}
 
@@ -91,6 +98,7 @@ public class Hero extends StepperUnit {
 	}
 
 	public boolean tryToUseItem(ItemType item) {
+		System.out.println("hero.tryToUseItem(" + item); //TODO
 		if (timeUntilItemReady <= 0) {
 			LoadedData.getItemData(item).wasUsed(this);
 			timeUntilItemReady = ITEM_COOLDOWN;
@@ -137,7 +145,7 @@ public class Hero extends StepperUnit {
 			AbilityData stats = LoadedData.getAbilityData(abilityType);
 			performAction(stats.action);
 			if (stats.sound != null) {
-				Sounds.play(stats.sound);
+				SoundHandler.play(stats.sound);
 			}
 
 			addToMana(-stats.manaCost);

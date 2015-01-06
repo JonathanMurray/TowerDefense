@@ -11,7 +11,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
 import rendering.HUD;
-import rendering.OfflineRenderableEntity;
+import rendering.ClientRenderableEntity;
 
 
 public class NeutralUnit extends SeekerUnit {
@@ -32,7 +32,7 @@ public class NeutralUnit extends SeekerUnit {
 		this.name = name;
 		this.waitTime = waitTime;
 		this.wanderLocations = wanderLocations;
-		setRenderableEntity(OfflineRenderableEntity.createNeutral(getPixelLocation(), spriteSet, getDirection(), name));
+		setRenderableEntity(ClientRenderableEntity.createNeutral(getPixelLocation(), spriteSet, getDirection(), name));
 		seekToNewLocation();
 	}
 

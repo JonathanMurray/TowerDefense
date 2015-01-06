@@ -16,6 +16,11 @@ import applicationSpecific.ItemType;
 		super(container, firstButtonRect, buttonGap, numberOfButtons);
 	}
 	
+	boolean hasItemWithNumber(int itemNumber){
+		Button b =buttons.get(itemNumber - 1);
+		return b instanceof InventoryButton ;
+	}
+	
 	ItemType getItemWithNumber(int itemNumber){
 		Button b =buttons.get(itemNumber - 1);
 		if(b instanceof InventoryButton){
